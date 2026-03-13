@@ -29,10 +29,6 @@ const userSchema = new mongoose.Schema({
         sparse: true,
         index: true
     },
-    password: {
-        type: String,
-        select: false
-    },
     googleId: {
         type: String,
         unique: true,
