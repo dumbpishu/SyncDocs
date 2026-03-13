@@ -1,6 +1,7 @@
 import crypto from "crypto";
+import bcrypt from "bcryptjs"
 
-export const generateOtp = (length: number = 6): string => {
+export const generateOtp = (length: number = 6): { otp: string; hashedOtp: string } => {
     const digits = "0123456789";
 
     let otp = "";
@@ -10,5 +11,7 @@ export const generateOtp = (length: number = 6): string => {
         otp += digits[randomIndex];
     }
 
-    return otp;
+    const hashedOtp = bcrypt.hashSync(otp, 10);
+
+    return { otp, hashedOtp }
 };
