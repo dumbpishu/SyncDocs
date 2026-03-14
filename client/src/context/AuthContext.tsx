@@ -1,34 +1,69 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getCurrentUser } from "../api/auth.api";
+import { registerSessionExpiredHandler } from "../services/axios";
+import type { User } from "../types/auth";
 
-const AuthContext = createContext<any>(null);
+type AuthContextType = {
+  user: User | null;
+  loading: boolean;
+  refreshUser: () => Promise<User | null>;
+  markAuthenticated: (nextUser: User) => void;
+  clearSession: () => void;
+};
 
-export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-    const fetchUser = async () => {
-        try {
-            const data = await getCurrentUser();
-            setUser(data.user);
-        } catch (error) {
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const clearSession = () => {
+    setUser(null);
+  };
+
+  const refreshUser = async () => {
+    try {
+      const data = await getCurrentUser();
+      setUser(data.user);
+      return data.user;
+    } catch {
+      setUser(null);
+      return null;
+    } finally {
+      setLoading(false);
     }
+  };
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
+  const markAuthenticated = (nextUser: User) => {
+    setUser(nextUser);
+  };
 
-    return (
-        <AuthContext.Provider value={{ user, setUser, loading }}>
-            {children}
-        </AuthContext.Provider>
-    )
-}
+  useEffect(() => {
+    registerSessionExpiredHandler(clearSession);
+    void refreshUser();
+
+    return () => {
+      registerSessionExpiredHandler(null);
+    };
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        refreshUser,
+        markAuthenticated,
+        clearSession,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
-    return useContext(AuthContext);
-}
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be inside AuthProvider");
+  return context;
+};
