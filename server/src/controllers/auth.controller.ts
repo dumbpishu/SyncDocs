@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sendOtpService, verifyOtpService } from "../services/auth.service";
+import { getCurrentUserService, sendOtpService, verifyOtpService } from "../services/auth.service";
 
 export const sendOtp = async (req: Request, res: Response) => {
     try {
@@ -36,5 +36,21 @@ export const verifyOtp = async (req: Request, res: Response) => {
         return res.status(200).json({ message: "OTP verify successfully", user, accessToken, refreshToken });
     } catch (error) {
         return res.status(500).json({ message: "Failed to verify OTP" });
+    }
+}
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is missing" });
+        }
+
+        const user = await getCurrentUserService(userId);
+
+        return res.status(200).json({ user });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to get current user" });
     }
 }

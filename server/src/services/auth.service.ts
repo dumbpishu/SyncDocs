@@ -54,3 +54,11 @@ export const verifyOtpService = async (email: string, otp: string) => {
 
     return { user, accessToken, refreshToken };
 }
+
+export const getCurrentUserService = async (userId: string) => {
+    const user = await User.findById(userId).select("-__v");
+    if (!user) {
+        throw new Error("User not found.");
+    }
+    return user;
+}
