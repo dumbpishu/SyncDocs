@@ -6,6 +6,7 @@ import { otpEmailTemplate } from "../utils/emailTemplates";
 import { createUniqueUsername } from "../utils/generateUsername";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const sendOtpService = async (email: string) => {
     const existingOtp = await OTP.findOne({ email });
@@ -50,7 +51,7 @@ export const verifyOtpService = async (email: string, otp: string) => {
     }
 
     const accessToken = generateAccessToken(user._id.toString());
-    const refreshToken = generateRefreshToken(user._id.toString());
+    const refreshToken = await generateRefreshToken(user._id.toString());
 
     return { user, accessToken, refreshToken };
 }
@@ -61,4 +62,29 @@ export const getCurrentUserService = async (userId: string) => {
         throw new Error("User not found.");
     }
     return user;
+}
+
+export const refreshSessionService = async (refreshToken: string) => {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { id: string };
+
+    const user = await User.findById(decoded.id).select("+refreshToken");
+
+    if (!user || !user.refreshToken) {
+        throw new Error("Unauthorized");
+    }
+
+    const isValidRefreshToken = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    if (!isValidRefreshToken) {
+        throw new Error("Unauthorized");
+    }
+
+    const accessToken = generateAccessToken(user._id.toString());
+    const nextRefreshToken = await generateRefreshToken(user._id.toString());
+
+    return {
+        user,
+        accessToken,
+        refreshToken: nextRefreshToken,
+    };
 }
