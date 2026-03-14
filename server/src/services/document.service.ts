@@ -17,12 +17,12 @@ export const getDocumentByIdService = async (documentId: string, userId: string)
 }
 
 export const updateDocumentService = async (documentId: string, data: any) => {
-    const document = await Document.findByIdAndUpdate(documentId, { ...data, $inc: { version: 1 } }, { new: true }).populate("owner", "email username").populate("collaborators.user", "email username");
+    const document = await Document.findByIdAndUpdate({ _id: documentId }, { ...data, $inc: { version: 1 } }, { new: true }).populate("owner", "email username").populate("collaborators.user", "email username");
     return document;
 }
 
 export const deleteDocumentService = async (documentId: string, userId: string) => {
-    const document = await Document.findByIdAndUpdate({ _id: documentId, owner: userId }, { isDeleted: true }, { new: true });
+    const document = await Document.findOneAndUpdate({ _id: documentId, owner: userId }, { isDeleted: true }, { new: true });
     return document;
 }
 

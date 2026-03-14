@@ -1,5 +1,5 @@
 import express from "express";
-import { createDocument, getUserDocuments, getDocumentById, updateDocument, deleteDocument } from "../controllers/document.controller";
+import { createDocument, getUserDocuments, getDocumentById, updateDocument, deleteDocument, addCollaborator, removeCollaborator, updateCollaboratorRole } from "../controllers/document.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = express.Router();
@@ -11,5 +11,9 @@ router.get("/", getUserDocuments);
 router.get("/:id", getDocumentById);
 router.put("/:id", updateDocument);
 router.delete("/:id", deleteDocument);
+
+router.post("/:id/collaborators", addCollaborator);
+router.delete("/:id/collaborators", removeCollaborator);
+router.put("/:id/collaborators", updateCollaboratorRole);
 
 export default router;
