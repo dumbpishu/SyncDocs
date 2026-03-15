@@ -95,7 +95,7 @@ export default function AccountPage() {
   const initials = (username || user?.username || "U").slice(0, 1).toUpperCase();
 
   return (
-    <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto flex w-full max-w-370 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="overflow-hidden rounded-[36px] border border-[#d8dee9] bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-6 shadow-[0_28px_64px_rgba(15,23,42,0.08)] sm:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
@@ -133,7 +133,7 @@ export default function AccountPage() {
       )}
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-[32px] border border-[#dde3ec] bg-white p-6 shadow-[0_18px_38px_rgba(15,23,42,0.06)] sm:p-7">
+        <div className="rounded-4xl border border-[#dde3ec] bg-white p-6 shadow-[0_18px_38px_rgba(15,23,42,0.06)] sm:p-7">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-[#101828]">Profile details</p>
@@ -142,7 +142,7 @@ export default function AccountPage() {
           </div>
 
           <div className="mt-6 grid gap-5">
-            <div className="flex flex-col gap-5 rounded-[24px] border border-[#e8edf3] bg-[#fcfcfd] p-5 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-5 rounded-3xl border border-[#e8edf3] bg-[#fcfcfd] p-5 sm:flex-row sm:items-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -198,7 +198,7 @@ export default function AccountPage() {
               </label>
             </div>
 
-            <div className="rounded-[24px] border border-[#e4e7ec] bg-[#fcfcfd] px-5 py-5">
+            <div className="rounded-3xl border border-[#e4e7ec] bg-[#fcfcfd] px-5 py-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-medium text-[#344054]">Avatar URL</p>
               </div>
@@ -218,7 +218,7 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <aside className="rounded-[32px] border border-[#f1d4da] bg-[linear-gradient(180deg,#fffafa_0%,#fff6f7_100%)] p-6 shadow-[0_16px_34px_rgba(15,23,42,0.05)]">
+        <aside className="rounded-4xl border border-[#f1d4da] bg-[linear-gradient(180deg,#fffafa_0%,#fff6f7_100%)] p-6 shadow-[0_16px_34px_rgba(15,23,42,0.05)]">
           <p className="text-sm font-semibold text-[#912018]">Danger zone</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#7a271a]">Delete account</h2>
           <p className="mt-4 text-sm leading-7 text-[#b54708]">

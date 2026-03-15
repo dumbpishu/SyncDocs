@@ -1,38 +1,53 @@
 import { Link } from "react-router-dom";
 
-const workflowCards = [
+const valueCards = [
   {
-    label: "Workspace",
-    title: "One place for owned and shared docs",
-    text: "Separate views for owned documents, editor access, and viewer access make navigation feel immediate.",
+    label: "Writing",
+    title: "Start with a draft, finish with a document you can share",
+    text: "Rich formatting, images, collaboration, and PDF export keep the full document workflow in one place.",
   },
   {
-    label: "Permissions",
-    title: "Access that stays understandable",
-    text: "Invite collaborators, assign roles, rename documents, and manage participation without leaving the dashboard.",
+    label: "Collaboration",
+    title: "Keep everyone aligned around the same version",
+    text: "Owners, editors, and viewers work from a shared document without losing structure or clarity.",
   },
   {
-    label: "Delivery",
-    title: "From draft to polished PDF",
-    text: "Writers can stay in flow, then export a clean version when the document is ready to share externally.",
+    label: "Management",
+    title: "Simple control over documents and access",
+    text: "Organize owned files, manage collaborators, and stay on top of shared work from a clean dashboard.",
+  },
+];
+
+const trustCards = [
+  {
+    title: "Built for teams",
+    text: "Writers, reviewers, and collaborators can work in the same place without a messy handoff between tools.",
+  },
+  {
+    title: "Clear sharing",
+    text: "Invite the right people, choose who can edit or view, and keep document ownership easy to understand.",
+  },
+  {
+    title: "Ready to deliver",
+    text: "When the work is ready, export a clean PDF and share it outside the workspace with confidence.",
   },
 ];
 
 export default function LandingPage() {
   return (
     <div className="pb-20">
-      <section className="mx-auto max-w-[1560px] px-4 py-12 sm:px-6 lg:px-8 lg:py-18">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_540px] lg:items-center">
+      <section className="mx-auto max-w-[1560px] px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-center">
           <div className="max-w-4xl">
             <span className="inline-flex w-fit rounded-full border border-[#dbe3ee] bg-white px-3 py-1.5 text-sm font-medium text-[#475467] shadow-[0_10px_22px_rgba(15,23,42,0.05)]">
-              Real-time collaborative documents
+              Collaborative documents for modern teams
             </span>
-            <h1 className="mt-6 max-w-5xl text-5xl font-semibold tracking-[-0.045em] text-[#101828] sm:text-6xl lg:text-7xl">
-              Professional documents, collaboration, and control in one workspace.
+            <h1 className="mt-6 max-w-5xl text-5xl font-semibold tracking-[-0.05em] text-[#101828] sm:text-6xl lg:text-7xl">
+              A calm workspace for writing, reviewing, and sharing documents together.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#667085]">
-              SyncDocs combines writing, access control, live collaboration, and PDF export in a focused product
-              built for day-to-day team work.
+              SyncDocs helps teams create polished documents, manage access, collaborate in real time, and
+              export finished work without switching between scattered tools.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -46,13 +61,13 @@ export default function LandingPage() {
                 href="#product"
                 className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-white px-5 py-3 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
               >
-                View product
+                See how it works
               </a>
             </div>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              <StatCard label="Realtime" value="Editing" />
-              <StatCard label="Controlled" value="Sharing" />
+              <StatCard label="Shared" value="Writing" />
+              <StatCard label="Simple" value="Access" />
               <StatCard label="Ready" value="PDF export" />
             </div>
           </div>
@@ -63,8 +78,8 @@ export default function LandingPage() {
               <div className="rounded-[28px] border border-[#e4e7ec] bg-white">
                 <div className="flex items-center justify-between border-b border-[#eef2f6] px-5 py-4">
                   <div>
-                    <p className="text-sm font-semibold text-[#101828]">Product strategy</p>
-                    <p className="mt-1 text-xs text-[#98a2b3]">Shared with design, product, and operations</p>
+                    <p className="text-sm font-semibold text-[#101828]">Quarterly planning</p>
+                    <p className="mt-1 text-xs text-[#98a2b3]">Shared with product, design, and leadership</p>
                   </div>
                   <div className="flex -space-x-2">
                     <Avatar label="PS" />
@@ -81,7 +96,7 @@ export default function LandingPage() {
                         Editor
                       </span>
                       <span className="rounded-full bg-[#ecfdf3] px-3 py-1.5 text-[11px] font-semibold text-[#027a48]">
-                        Synced
+                        In sync
                       </span>
                     </div>
 
@@ -91,8 +106,8 @@ export default function LandingPage() {
                       <div className="h-3 w-11/12 rounded-full bg-[#e9eef5]" />
                       <div className="rounded-[22px] border border-[#dbe3ee] bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
                         <p className="text-sm font-medium leading-7 text-[#344054]">
-                          Editing, review, and access management stay close to the document instead of being
-                          split across tools.
+                          Comments, updates, and access stay close to the document so the team can move faster
+                          without losing context.
                         </p>
                       </div>
                       <div className="h-3 w-10/12 rounded-full bg-[#e9eef5]" />
@@ -101,8 +116,8 @@ export default function LandingPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <MiniPanel title="Roles" items={["Owner", "Editors", "Viewers"]} />
-                    <MiniPanel title="Capabilities" items={["Realtime presence", "PDF export", "Account controls"]} />
+                    <MiniPanel title="Access" items={["Owner", "Editors", "Viewers"]} />
+                    <MiniPanel title="Included" items={["Realtime editing", "PDF export", "Account settings"]} />
                   </div>
                 </div>
               </div>
@@ -111,19 +126,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-[1560px] px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#98a2b3]">Why teams use it</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#101828]">
-              Built for the work that happens after the first draft.
-            </h2>
-          </div>
-        </div>
-
+      <section id="features" className="mx-auto max-w-[1560px] px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-3">
-          {workflowCards.map((item) => (
-            <WorkflowCard key={item.title} label={item.label} title={item.title} text={item.text} />
+          {valueCards.map((item) => (
+            <ValueCard key={item.title} label={item.label} title={item.title} text={item.text} />
           ))}
         </div>
       </section>
@@ -131,19 +137,20 @@ export default function LandingPage() {
       <section id="security" className="mx-auto max-w-[1560px] px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#0f172a_0%,#1f2937_52%,#334155_100%)] p-7 text-white shadow-[0_22px_52px_rgba(15,23,42,0.18)]">
-            <p className="text-sm font-semibold text-white/80">Security</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">Access stays controlled as the workspace grows.</h2>
+            <p className="text-sm font-semibold text-white/80">Why teams trust it</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+              Built to keep document work clear, shared, and dependable.
+            </h2>
             <p className="mt-4 text-sm leading-7 text-white/84">
-              OTP sign-in, refresh-backed sessions, protected routes, and consistent role enforcement help teams
-              move quickly without losing structure.
+              SyncDocs gives teams one place to write, review, manage access, and publish finished documents
+              without the confusion that usually comes from splitting the workflow across multiple tools.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <InfoCard title="OTP login" text="Fast authentication without adding password friction." />
-            <InfoCard title="Cookie sessions" text="Sessions stay server-aware and ready for protected routes." />
-            <InfoCard title="Role checks" text="Owners, editors, and viewers are enforced consistently across the app." />
-            <InfoCard title="Account controls" text="Avatar upload, profile settings, and logout are built into the workspace." />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {trustCards.map((item) => (
+              <TrustCard key={item.title} title={item.title} text={item.text} />
+            ))}
           </div>
         </div>
       </section>
@@ -183,7 +190,7 @@ function MiniPanel({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function WorkflowCard({
+function ValueCard({
   label,
   title,
   text,
@@ -195,13 +202,13 @@ function WorkflowCard({
   return (
     <div className="rounded-[28px] border border-[#dde3ec] bg-white p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#98a2b3]">{label}</p>
-      <p className="mt-4 text-xl font-semibold text-[#101828]">{title}</p>
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-[#101828]">{title}</p>
       <p className="mt-3 text-sm leading-7 text-[#667085]">{text}</p>
     </div>
   );
 }
 
-function InfoCard({ title, text }: { title: string; text: string }) {
+function TrustCard({ title, text }: { title: string; text: string }) {
   return (
     <div className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
       <p className="text-lg font-semibold text-[#101828]">{title}</p>
