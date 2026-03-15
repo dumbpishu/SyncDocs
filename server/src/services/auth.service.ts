@@ -39,9 +39,13 @@ export const sendOtpService = async (email: string) => {
         { upsert: true, new: true }
     );
 
-    // await sendEmail(normalizedEmail, "Your OTP for SyncDocs", otpEmailTemplate(otp));
-    sendEmail(normalizedEmail, "Your OTP for SyncDocs", otpEmailTemplate(otp))
-        .catch(err => console.error("Email send failed:", err));
+    sendEmail(
+        normalizedEmail,
+        "Your SyncDocs OTP Code",
+        otpEmailTemplate(otp)
+    ).catch((error) => {
+        console.error("Failed to send OTP email:", error);
+    });
 }
 
 export const verifyOtpService = async (email: string, otp: string) => {

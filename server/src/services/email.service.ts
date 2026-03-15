@@ -1,24 +1,16 @@
-import nodemailer from 'nodemailer';
+import { Resend } from "resend";
 
-export const emailTransporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
-});
+const resend = new Resend(process.env.RESEND_API_KEY || "");
 
 export const sendEmail = async (
-    to: string,
-    subject: string,
-    html: string
-) => {
-    await emailTransporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to,
-        subject,
-        html
-    });
+  to: string,
+  subject: string,
+  html: string
+): Promise<void> => {
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM as string,
+    to,
+    subject,
+    html,
+  });
 };
