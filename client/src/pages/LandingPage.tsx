@@ -2,94 +2,77 @@ import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
-    <div className="pb-16">
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 pb-10 pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-10 lg:pt-20">
-        <div className="animate-[slideUp_500ms_ease-out]">
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white px-4 py-2 text-sm text-[#5f5e5b] shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[#5f5e5b]" />
+    <div className="pb-20">
+      <section className="mx-auto grid max-w-[1540px] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_460px] lg:px-8 lg:py-24">
+        <div className="flex flex-col justify-center">
+          <span className="inline-flex w-fit rounded-full border border-[#dbe3ee] bg-white px-3 py-1 text-sm font-medium text-[#475467] shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
             Real-time collaboration
-          </div>
-
-          <h1 className="mt-8 max-w-4xl text-5xl font-semibold tracking-[-0.04em] text-[#191919] sm:text-6xl lg:text-7xl">
-            Write together without losing flow.
+          </span>
+          <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-tight text-[#101828] sm:text-6xl lg:text-7xl">
+            Documents that feel fast, structured, and shared by default.
           </h1>
-
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#6b6b6b]">
-            SyncDocs is a shared document workspace for drafting, editing, and reviewing with your team in real time.
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#667085]">
+            SyncDocs brings editing, collaboration, permissions, PDF export, and account management into a focused workspace built for teams.
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link to="/login" className="rounded-xl bg-[#191919] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#2f2f2f]">
-              Start writing now
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to="/login"
+              className="rounded-xl bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
+            >
+              Open workspace
             </Link>
             <a
               href="#features"
-              className="rounded-xl border border-black/8 bg-white px-6 py-3 text-sm font-semibold text-[#5f5e5b] transition hover:bg-[#f3f3f1] hover:text-[#191919]"
+              className="rounded-xl border border-[#d0d5dd] bg-white px-5 py-3 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
             >
-              Explore the product
+              Explore features
             </a>
           </div>
 
-          <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
-            <Stat label="Editing" value="Live" />
-            <Stat label="Auth" value="OTP" />
-            <Stat label="Session" value="Refresh" />
+          <div className="mt-10 grid max-w-2xl gap-4 sm:grid-cols-3">
+            <StatCard label="Editing" value="Live" />
+            <StatCard label="Sharing" value="Role-based" />
+            <StatCard label="Export" value="PDF" />
           </div>
         </div>
 
-        <div id="workspace" className="relative animate-[fadeIn_700ms_ease-out]">
-          <div className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.7),transparent)]" />
-
-          <div className="relative rounded-[2rem] border border-black/8 bg-[#fbfbfa] p-4 shadow-[0_8px_30px_rgba(15,15,15,0.05)]">
-            <div className="rounded-[1.6rem] border border-black/8 bg-[#f7f7f5] p-4">
-              <div className="flex items-center justify-between rounded-[1.3rem] border border-black/8 bg-white px-4 py-3">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-[32px] bg-[linear-gradient(135deg,rgba(39,70,144,0.12),rgba(17,24,39,0.04))] blur-3xl" />
+          <div className="relative rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+            <div className="rounded-[24px] border border-[#e4e7ec] bg-white p-5">
+              <div className="flex items-center justify-between border-b border-[#eef2f7] pb-4">
                 <div>
-                  <p className="text-sm font-semibold text-[#191919]">Team Planning Doc</p>
-                  <p className="text-xs text-[#6b6b6b]">3 people active</p>
+                  <p className="text-sm font-semibold text-[#101828]">Quarterly planning</p>
+                  <p className="text-xs text-[#98a2b3]">Owner: Product</p>
                 </div>
                 <div className="flex -space-x-2">
-                  <Avatar label="AJ" />
-                  <Avatar label="RK" />
-                  <Avatar label="PM" />
+                  <Avatar label="AD" />
+                  <Avatar label="MK" />
+                  <Avatar label="RP" />
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-4 lg:grid-cols-[0.62fr_0.38fr]">
-                <div className="rounded-[1.5rem] border border-black/8 bg-white p-5">
-                  <div className="mb-5 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-[#787774]">
+              <div className="grid gap-4 pt-5 lg:grid-cols-[minmax(0,1fr)_180px]">
+                <div className="rounded-[20px] border border-[#e4e7ec] bg-[#fcfdff] p-4">
+                  <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#98a2b3]">
                     Editor
                   </div>
-                  <div className="space-y-4">
-                    <div className="h-3 w-4/5 rounded-full bg-[#191919]/90" />
-                    <div className="h-3 w-full rounded-full bg-[#e9e9e7] animate-pulse" />
-                    <div className="h-3 w-11/12 rounded-full bg-[#e9e9e7]" />
-                    <div className="h-3 w-2/3 rounded-full bg-[#dcdcd8] animate-pulse" />
-                    <div className="rounded-2xl border border-black/8 bg-[#f7f7f5] p-4">
-                      <p className="text-sm font-medium text-[#191919]">Someone is editing this section right now.</p>
-                      <p className="mt-1 text-sm text-[#6b6b6b]">Presence and syncing help everyone stay aligned.</p>
+                  <div className="space-y-3">
+                    <div className="h-3 w-3/4 rounded-full bg-[#111827]" />
+                    <div className="h-3 w-full rounded-full bg-[#e9eef5]" />
+                    <div className="h-3 w-11/12 rounded-full bg-[#e9eef5]" />
+                    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4">
+                      <p className="text-sm font-medium text-[#344054]">Comments, sharing, and access controls stay close to the document.</p>
                     </div>
-                    <div className="h-3 w-full rounded-full bg-[#e9e9e7]" />
-                    <div className="h-3 w-9/12 rounded-full bg-[#e9e9e7]" />
+                    <div className="h-3 w-10/12 rounded-full bg-[#e9eef5]" />
+                    <div className="h-3 w-8/12 rounded-full bg-[#e9eef5]" />
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-[1.5rem] border border-black/8 bg-[#191919] p-5 text-stone-100">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/50">Workspace</p>
-                    <div className="mt-4 space-y-3">
-                      <Signal title="Presence" detail="See who is active in the document." />
-                      <Signal title="Comments" detail="Keep feedback attached to the work." />
-                      <Signal title="Sync" detail="Changes show up as they happen." />
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.5rem] border border-black/8 bg-white p-5">
-                    <p className="text-xs uppercase tracking-[0.28em] text-[#787774]">Authentication</p>
-                    <div className="mt-4 space-y-3">
-                      <MiniCard value="OTP login" label="Passwordless sign-in" />
-                      <MiniCard value="Refresh token" label="Session recovery" />
-                    </div>
-                  </div>
+                  <MiniPanel title="Access" items={["Owner", "Editors", "Viewers"]} />
+                  <MiniPanel title="Workspace" items={["Realtime sync", "PDF export", "Account settings"]} />
                 </div>
               </div>
             </div>
@@ -97,51 +80,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
-        <div className="mb-10 max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#787774]">
-            Features
-          </p>
-          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-[#191919]">
-            The essentials for a collaborative writing experience.
-          </h2>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          <Feature
-            title="Real-time editing"
-            desc="Work in the same document with live updates, presence cues, and fewer collisions."
+      <section id="features" className="mx-auto max-w-[1540px] px-4 py-4 sm:px-6 lg:px-8">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <FeatureCard
+            title="Collaborative editing"
+            text="Edit documents together with live updates, presence, and shared access rules."
           />
-          <Feature
-            title="Focused collaboration"
-            desc="Comments, ownership signals, and shared context keep review cycles moving."
+          <FeatureCard
+            title="Document management"
+            text="Create, rename, organize, share, and manage owned or shared documents from one dashboard."
           />
-          <Feature
-            title="Modern auth foundation"
-            desc="Email OTP plus refresh-token session recovery keeps sign-in simple without feeling fragile."
+          <FeatureCard
+            title="Professional workflow"
+            text="Upload avatars, control account access, and export documents to PDF when needed."
           />
         </div>
       </section>
 
-      <section id="security" className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[2rem] border border-stone-200 bg-stone-950 p-8 text-stone-100 shadow-[0_18px_60px_rgba(28,25,23,0.14)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/50">
-              Security
-            </p>
-            <h3 className="mt-4 text-3xl font-semibold">
-              Simple sign-in with reliable session handling.
-            </h3>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-stone-300">
-              Short-lived access tokens and refresh-token based recovery keep the auth flow simple on the surface and dependable underneath.
+      <section id="security" className="mx-auto max-w-[1540px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <div className="rounded-[28px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#111827_0%,#1d3557_52%,#274690_100%)] p-7 text-white shadow-[0_20px_50px_rgba(17,24,39,0.18)]">
+            <p className="text-sm font-semibold text-white/84">Security</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">Built around controlled access.</h2>
+            <p className="mt-4 text-sm leading-7 text-white/88">
+              OTP sign-in, refresh-based sessions, protected routes, and server-enforced permissions keep the workspace simple and reliable.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <SecurityCard title="OTP sign-in" text="Fast onboarding for collaborators joining from email invites or direct links." />
-            <SecurityCard title="Cookie sessions" text="Tokens stay out of local storage and ride along securely with API requests." />
-            <SecurityCard title="Auto refresh" text="Expired access tokens recover silently so the workspace stays uninterrupted." />
-            <SecurityCard title="Protected routes" text="Dashboard and future editor routes can depend on a consistent auth state." />
+            <InfoCard title="OTP login" text="Fast sign-in without passwords." />
+            <InfoCard title="Cookie sessions" text="Auth state stays server-backed and secure." />
+            <InfoCard title="Role checks" text="Owners, editors, and viewers are enforced on the server." />
+            <InfoCard title="Account controls" text="Profile updates, avatar upload, and logout are built in." />
           </div>
         </div>
       </section>
@@ -149,60 +119,53 @@ export default function LandingPage() {
   );
 }
 
-function Feature({ title, desc }: { title: string; desc: string }) {
+function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[1.75rem] border border-black/8 bg-white p-7 shadow-[0_1px_3px_rgba(15,15,15,0.05)] transition hover:bg-[#fcfcfb]">
-      <div className="mb-5 h-12 w-12 rounded-2xl border border-black/8 bg-[#f3f3f1]" />
-      <h3 className="text-xl font-semibold text-stone-900">
-        {title}
-      </h3>
-      <p className="mt-3 text-sm leading-7 text-[#6b6b6b]">
-        {desc}
-      </p>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[1.25rem] border border-black/8 bg-white px-4 py-5 shadow-sm">
-      <p className="text-2xl font-semibold tracking-tight text-[#191919]">{value}</p>
-      <p className="mt-1 text-sm text-[#6b6b6b]">{label}</p>
+    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+      <p className="text-xl font-semibold text-[#101828]">{value}</p>
+      <p className="mt-1 text-sm text-[#667085]">{label}</p>
     </div>
   );
 }
 
 function Avatar({ label }: { label: string }) {
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black/8 bg-[#f3f3f1] text-xs font-semibold text-[#5f5e5b]">
+    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-[#dbeafe] text-xs font-semibold text-[#274690] shadow-[0_8px_18px_rgba(39,70,144,0.12)]">
       {label}
     </div>
   );
 }
 
-function Signal({ title, detail }: { title: string; detail: string }) {
+function MiniPanel({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <p className="text-sm font-medium text-white">{title}</p>
-      <p className="mt-1 text-sm text-stone-300">{detail}</p>
+    <div className="rounded-[20px] border border-[#e4e7ec] bg-[#fcfdff] p-4">
+      <p className="text-sm font-semibold text-[#101828]">{title}</p>
+      <div className="mt-3 space-y-2">
+        {items.map((item) => (
+          <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm text-[#475467] shadow-[0_6px_16px_rgba(15,23,42,0.03)]">
+            {item}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-function MiniCard({ value, label }: { value: string; label: string }) {
+function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-black/8 bg-[#f7f7f5] p-4">
-      <p className="text-base font-semibold text-[#191919]">{value}</p>
-      <p className="mt-1 text-sm text-[#6b6b6b]">{label}</p>
+    <div className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
+      <div className="mb-5 h-12 w-12 rounded-2xl bg-[linear-gradient(135deg,#e0ecff,#edf4ff)]" />
+      <p className="text-xl font-semibold text-[#101828]">{title}</p>
+      <p className="mt-3 text-sm leading-7 text-[#667085]">{text}</p>
     </div>
   );
 }
 
-function SecurityCard({ title, text }: { title: string; text: string }) {
+function InfoCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-[1.75rem] border border-black/8 bg-white p-6 shadow-[0_1px_3px_rgba(15,15,15,0.05)]">
-      <p className="text-lg font-semibold text-[#191919]">{title}</p>
-      <p className="mt-3 text-sm leading-7 text-[#6b6b6b]">{text}</p>
+    <div className="rounded-[24px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
+      <p className="text-lg font-semibold text-[#101828]">{title}</p>
+      <p className="mt-3 text-sm leading-7 text-[#667085]">{text}</p>
     </div>
   );
 }

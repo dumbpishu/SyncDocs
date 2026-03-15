@@ -29,7 +29,7 @@ type CursorPosition = {
 };
 
 type PendingDocumentUpdate = {
-    content: string;
+    content?: string;
     title?: string;
 };
 
@@ -132,7 +132,7 @@ const scheduleDocumentSave = (documentId: string) => {
         await Document.findOneAndUpdate(
             { _id: documentId, isDeleted: false },
             {
-                content: pendingUpdate.content,
+                ...(pendingUpdate.content !== undefined ? { content: pendingUpdate.content } : {}),
                 ...(pendingUpdate.title !== undefined ? { title: pendingUpdate.title } : {}),
                 $inc: { version: 1 },
             }
@@ -234,7 +234,12 @@ export const registerCollaborationServer = (httpServer: ReturnType<typeof create
                     return;
                 }
 
-                pendingDocumentUpdates.set(documentId, { content });
+                const pendingUpdate = pendingDocumentUpdates.get(documentId) ?? {};
+
+                pendingDocumentUpdates.set(documentId, {
+                    ...pendingUpdate,
+                    content,
+                });
                 scheduleDocumentSave(documentId);
 
                 socket.to(getRoomName(documentId)).emit("document:update", {
@@ -251,14 +256,12 @@ export const registerCollaborationServer = (httpServer: ReturnType<typeof create
                 const user = socket.data.user as AuthenticatedUser;
                 const access = await getDocumentAccess(documentId, user._id);
 
-                if (!access || !access.canEdit) {
-                    socket.emit("document:error", { message: "You do not have permission to edit this document" });
+                if (!access?.document.owner || access.document.owner.toString() !== user._id) {
+                    socket.emit("document:error", { message: "Only the document owner can rename this document" });
                     return;
                 }
 
-                const pendingUpdate = pendingDocumentUpdates.get(documentId) ?? {
-                    content: access.document.content || "",
-                };
+                const pendingUpdate = pendingDocumentUpdates.get(documentId) ?? {};
 
                 pendingDocumentUpdates.set(documentId, {
                     ...pendingUpdate,

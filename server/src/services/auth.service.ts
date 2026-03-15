@@ -1,5 +1,6 @@
 import { User } from "../models/user.model";
 import { OTP } from "../models/otp.model";
+import { Document } from "../models/document.model";
 import { generateOtp } from "../utils/generateOtp";
 import { sendEmail } from "./email.service";
 import { otpEmailTemplate } from "../utils/emailTemplates";
@@ -8,6 +9,7 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/appError";
+import { uploadImageToCloudinary } from "./cloudinary.service";
 
 const OTP_EXPIRY_IN_MS = 5 * 60 * 1000;
 
@@ -98,4 +100,90 @@ export const refreshSessionService = async (refreshToken: string) => {
         user,
         ...tokens,
     };
+}
+
+export const updateCurrentUserService = async (
+    userId: string,
+    data: {
+        fullName?: string;
+        username?: string;
+        avatar?: string;
+    }
+) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found.");
+    }
+
+    if (data.username !== undefined) {
+        const normalizedUsername = data.username.trim().toLowerCase();
+        const existingUser = await User.findOne({ username: normalizedUsername, _id: { $ne: userId } });
+
+        if (existingUser) {
+            throw new AppError(409, "Username is already taken.");
+        }
+
+        user.username = normalizedUsername;
+    }
+
+    if (data.fullName !== undefined) {
+        user.fullName = data.fullName.trim();
+    }
+
+    if (data.avatar !== undefined) {
+        user.avatar = data.avatar.trim();
+    }
+
+    await user.save();
+
+    return User.findById(userId).select("-__v").orFail();
+}
+
+export const deleteCurrentUserService = async (userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found.");
+    }
+
+    await Promise.all([
+        Document.updateMany(
+            { owner: userId, isDeleted: false },
+            { isDeleted: true }
+        ),
+        Document.updateMany(
+            { "collaborators.user": userId },
+            { $pull: { collaborators: { user: userId } }, $inc: { version: 1 } }
+        ),
+        OTP.deleteMany({ email: user.email }),
+        User.findByIdAndDelete(userId)
+    ]);
+
+    return user;
+}
+
+export const uploadCurrentUserAvatarService = async (userId: string, imageData: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found.");
+    }
+
+    const avatarUrl = await uploadImageToCloudinary(imageData, "syncdocs/avatars");
+    user.avatar = avatarUrl;
+    await user.save();
+
+    return User.findById(userId).select("-__v").orFail();
+}
+
+export const logoutCurrentUserService = async (userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found.");
+    }
+
+    user.refreshToken = undefined;
+    await user.save();
 }

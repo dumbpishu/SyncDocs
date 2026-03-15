@@ -7,6 +7,7 @@ import LoginPage from "../pages/LoginPage";
 import VerifyOtpPage from "../pages/VerifyOtpPage";
 import DashboardPage from "../pages/DashboardPage";
 import DocumentEditorPage from "../pages/DocumentEditorPage";
+import AccountPage from "../pages/AccountPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -27,6 +28,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "account",
+        element: (
+          <ProtectedRoute>
+            <AccountPage />
           </ProtectedRoute>
         )
       },

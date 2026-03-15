@@ -33,6 +33,7 @@ import {
   $getSelection,
   $isRangeSelection,
   $createParagraphNode,
+  $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
@@ -41,10 +42,11 @@ import {
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
-import { $setBlocksType } from "@lexical/selection";
+import { $patchStyleText, $setBlocksType } from "@lexical/selection";
 import { TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { TRANSFORMERS } from "@lexical/markdown";
 import type { RemoteCursor } from "../../types/document";
+import { ImageNode, insertImage } from "./nodes/ImageNode";
 
 type CollaborativeLexicalEditorProps = {
   documentId: string;
@@ -62,15 +64,16 @@ type SyncState = {
 
 const editorTheme = {
   paragraph: "mb-3",
-  quote: "border-l-2 border-black/10 pl-4 text-[#5f5e5b] italic",
+  quote: "border-l-2 border-[#bfd1f3] pl-4 text-[#475467] italic",
   heading: {
-    h1: "mb-4 mt-6 text-3xl font-semibold text-[#191919]",
-    h2: "mb-3 mt-5 text-2xl font-semibold text-[#191919]",
+    h1: "mb-4 mt-6 text-4xl font-semibold tracking-tight text-[#101828]",
+    h2: "mb-3 mt-5 text-3xl font-semibold tracking-tight text-[#101828]",
   },
   text: {
     bold: "font-semibold",
     italic: "italic",
     underline: "underline",
+    strikethrough: "line-through",
   },
   list: {
     ul: "my-4 list-disc pl-6",
@@ -81,7 +84,7 @@ const editorTheme = {
       listitem: "mt-1",
     },
   },
-  code: "rounded-lg bg-[#f7f7f5] px-1.5 py-0.5 font-mono text-[13px]",
+  code: "rounded-lg bg-[#f2f4f7] px-1.5 py-0.5 font-mono text-[13px]",
   codeHighlight: {
     atrule: "text-[#7c3aed]",
     attr: "text-[#2563eb]",
@@ -114,7 +117,7 @@ const editorTheme = {
     url: "text-[#2563eb]",
     variable: "text-[#191919]",
   },
-  link: "text-[#2f2f2f] underline underline-offset-2",
+  link: "text-[#274690] underline underline-offset-2",
 };
 
 const createPlainTextDocumentState = (content: string) => {
@@ -211,6 +214,7 @@ export function CollaborativeLexicalEditor({
       ListItemNode,
       CodeNode,
       CodeHighlightNode,
+      ImageNode,
       TableNode,
       TableCellNode,
       TableRowNode,
@@ -218,7 +222,7 @@ export function CollaborativeLexicalEditor({
   };
 
   return (
-    <div className="relative rounded-[1.25rem] border border-black/8 bg-white">
+    <div className="relative overflow-hidden rounded-[24px] border border-[#e4e7ec] bg-[linear-gradient(180deg,#fbfcfe_0%,#ffffff_18%)]">
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin canEdit={canEdit} />
         <EditorContentSync
@@ -229,14 +233,14 @@ export function CollaborativeLexicalEditor({
           onCursorChange={onCursorChange}
         />
 
-        <div className="relative min-h-[520px] px-5 py-4">
+        <div className="relative min-h-[calc(100vh-10rem)] px-10 py-8">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="min-h-[488px] resize-none text-[15px] leading-7 text-[#2f2f2f] outline-none" />
+              <ContentEditable className="syncdocs-editor-content min-h-[calc(100vh-12rem)] resize-none text-[16px] leading-8 text-[#1f2937] outline-none" />
             }
             placeholder={
-              <div className="pointer-events-none absolute left-5 top-4 text-sm text-[#9b9a97]">
-                Start writing here...
+              <div className="pointer-events-none absolute left-10 top-8 text-sm text-[#98a2b3]">
+                Write
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
@@ -300,6 +304,7 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
   const [isCode, setIsCode] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [textColor, setTextColor] = useState("#243640");
 
   useEffect(() => {
     return editor.registerCommand(
@@ -314,6 +319,13 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
             setIsUnderline(selection.hasFormat("underline"));
             setIsStrikethrough(selection.hasFormat("strikethrough"));
             setIsCode(selection.hasFormat("code"));
+
+            const anchorNode = selection.anchor.getNode();
+            const colorSource = $isTextNode(anchorNode)
+              ? anchorNode.getStyle()
+              : anchorNode.getParent()?.getStyle?.() ?? "";
+            const matchedColor = colorSource.match(/color:\s*([^;]+)/i)?.[1]?.trim() ?? "";
+            setTextColor(isHexColor(matchedColor) ? matchedColor : "#243640");
           }
         });
 
@@ -368,8 +380,61 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
     editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
   };
 
+  const applyTextColor = (nextColor: string) => {
+    setTextColor(nextColor);
+
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if (!$isRangeSelection(selection)) {
+        return;
+      }
+
+      $patchStyleText(selection, {
+        color: nextColor,
+      });
+    });
+  };
+
+  const handleInsertImage = () => {
+    const source = window.prompt("Paste an image URL");
+    if (!source?.trim()) {
+      return;
+    }
+
+    const altText = window.prompt("Add alt text for the image (optional)") ?? "";
+    insertImage(editor, { src: source.trim(), altText: altText.trim() });
+  };
+
+  const handleUploadImage = () => {
+    const input = window.document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = typeof reader.result === "string" ? reader.result : "";
+        if (!result) {
+          return;
+        }
+
+        const altText = window.prompt("Add alt text for the image (optional)") ?? file.name;
+        insertImage(editor, { src: result, altText: altText.trim() });
+      };
+      reader.readAsDataURL(file);
+    };
+
+    input.click();
+  };
+
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-black/8 px-4 py-3">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-[#e4e7ec] bg-white/92 px-4 py-3 backdrop-blur">
       <ToolbarButton label="Undo" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={!canEdit || !canUndo} />
       <ToolbarButton label="Redo" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={!canEdit || !canRedo} />
       <ToolbarDivider />
@@ -384,6 +449,17 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
       <ToolbarButton label="U" active={isUnderline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")} disabled={!canEdit} />
       <ToolbarButton label="S" active={isStrikethrough} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")} disabled={!canEdit} />
       <ToolbarButton label="Inline code" active={isCode} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")} disabled={!canEdit} />
+      <label className="flex items-center gap-2 rounded-xl bg-[#f8fafc] px-3 py-2 text-xs font-semibold text-[#475467]">
+        Color
+        <input
+          type="color"
+          value={textColor}
+          onChange={(event) => applyTextColor(event.target.value)}
+          disabled={!canEdit}
+          className="h-6 w-6 cursor-pointer rounded-full border-0 bg-transparent p-0 disabled:cursor-not-allowed"
+          title="Change text color"
+        />
+      </label>
       <ToolbarDivider />
       <ToolbarButton label="Bullets" onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
       <ToolbarButton label="Numbers" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
@@ -398,6 +474,8 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
         disabled={!canEdit}
       />
       <ToolbarButton label="Link" onClick={toggleLink} disabled={!canEdit} />
+      <ToolbarButton label="Image URL" onClick={handleInsertImage} disabled={!canEdit} />
+      <ToolbarButton label="Upload image" onClick={handleUploadImage} disabled={!canEdit} />
     </div>
   );
 }
@@ -418,10 +496,10 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+      className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
         active
-          ? "bg-[#191919] text-white"
-          : "bg-white text-[#4b4b4b] hover:bg-[#f3f3f1]"
+          ? "bg-[#111827] text-white shadow-[0_8px_16px_rgba(17,24,39,0.18)]"
+          : "bg-[#f8fafc] text-[#475467] hover:bg-[#eef2f7]"
       } disabled:cursor-not-allowed disabled:opacity-50`}
     >
       {label}
@@ -430,7 +508,11 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <div className="h-6 w-px bg-black/8" />;
+  return <div className="h-6 w-px bg-[#e4e7ec]" />;
+}
+
+function isHexColor(value?: string) {
+  return Boolean(value && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value));
 }
 
 function EditorContentSync({

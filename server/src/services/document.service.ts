@@ -103,15 +103,19 @@ export const updateDocumentService = async (documentId: string, userId: string, 
         throw new AppError(403, "You do not have access to this document");
     }
 
-    if (!access.canEdit) {
-        throw new AppError(403, "You do not have permission to edit this document");
-    }
-
     if (data.title !== undefined) {
+        if (!access.isOwner) {
+            throw new AppError(403, "Only the document owner can rename this document");
+        }
+
         document.title = data.title;
     }
 
     if (data.content !== undefined) {
+        if (!access.canEdit) {
+            throw new AppError(403, "You do not have permission to edit this document");
+        }
+
         document.content = data.content;
     }
 

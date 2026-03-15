@@ -1,5 +1,5 @@
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp } from "../api/auth.api";
 import AuthLayout from "../components/layouts/AuthLayout";
 import { useAuth } from "../context/AuthContext";
@@ -9,7 +9,6 @@ export default function VerifyOtpPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { markAuthenticated } = useAuth();
-
   const email = location.state?.email as string | undefined;
 
   const [otp, setOtp] = useState("");
@@ -23,7 +22,7 @@ export default function VerifyOtpPage() {
     }
 
     if (!otp.trim()) {
-      setError("Enter the 6-digit OTP from your inbox.");
+      setError("Enter the 6-digit code.");
       return;
     }
 
@@ -36,8 +35,8 @@ export default function VerifyOtpPage() {
         markAuthenticated(data.user);
       }
       navigate("/dashboard", { replace: true });
-    } catch (error) {
-      setError(getApiErrorMessage(error, "That OTP didn't work. Double-check the code and try again."));
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to verify the code."));
     } finally {
       setLoading(false);
     }
@@ -47,30 +46,28 @@ export default function VerifyOtpPage() {
 
   return (
     <AuthLayout>
-      <div className="mb-8 animate-[slideUp_500ms_ease-out]">
-        <h2 className="text-3xl font-semibold tracking-tight text-[#191919] sm:text-4xl">
-          Check your inbox
-        </h2>
-        <p className="mt-3 text-sm leading-6 text-[#6b6b6b]">
-          We sent a one-time passcode to <span className="font-medium text-[#191919]">{email}</span>.
+      <div className="mb-8">
+        <h2 className="text-3xl font-semibold tracking-tight text-[#2f2f2b] sm:text-4xl">Verify code</h2>
+        <p className="mt-3 text-sm leading-6 text-[#787774]">
+          A one-time code was sent to <span className="font-medium text-[#37352f]">{email}</span>.
         </p>
       </div>
 
-      <label className="mb-2 block text-sm font-medium text-[#3f3f3f]" htmlFor="otp">
-        One-time passcode
+      <label className="mb-2 block text-sm font-medium text-[#37352f]" htmlFor="otp">
+        Code
       </label>
       <input
         id="otp"
         inputMode="numeric"
         maxLength={6}
-        placeholder="Enter OTP"
-        className="w-full rounded-xl border border-black/8 bg-white px-4 py-3 text-[#191919] outline-none transition focus:border-[#191919]"
+        placeholder="123456"
+        className="w-full rounded-xl border border-[#dfddd7] bg-white px-4 py-3 text-[#2f2f2b] outline-none transition focus:border-[#b8b4ac]"
         value={otp}
-        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+        onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))}
       />
 
       {error ? (
-        <p className="mt-3 rounded-xl border border-black/8 bg-[#f1f1ef] px-4 py-3 text-sm text-[#3f3f3f] animate-[fadeIn_250ms_ease-out]">
+        <p className="mt-3 rounded-xl border border-[#ead5d1] bg-[#fff8f7] px-4 py-3 text-sm text-[#8a3c2f]">
           {error}
         </p>
       ) : null}
@@ -78,9 +75,9 @@ export default function VerifyOtpPage() {
       <button
         onClick={handleVerify}
         disabled={loading}
-        className="mt-6 w-full rounded-xl bg-[#191919] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2f2f2f] disabled:cursor-not-allowed disabled:opacity-70"
+        className="mt-6 w-full rounded-xl bg-[#2f2f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20201d] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Verifying..." : "Verify OTP"}
+        {loading ? "Verifying..." : "Continue"}
       </button>
     </AuthLayout>
   );

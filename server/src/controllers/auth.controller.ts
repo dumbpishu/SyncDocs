@@ -1,5 +1,14 @@
 import { Request, Response } from "express";
-import { getCurrentUserService, refreshSessionService, sendOtpService, verifyOtpService } from "../services/auth.service";
+import {
+    deleteCurrentUserService,
+    getCurrentUserService,
+    logoutCurrentUserService,
+    refreshSessionService,
+    sendOtpService,
+    uploadCurrentUserAvatarService,
+    updateCurrentUserService,
+    verifyOtpService
+} from "../services/auth.service";
 import { clearSessionCookies, setSessionCookies } from "../utils/authCookies";
 import { getErrorResponse } from "../utils/controller";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/apiResponse";
@@ -91,6 +100,99 @@ export const refreshSession = async (req: Request, res: Response) => {
         clearSessionCookies(res);
 
         const { statusCode, message, errors } = getErrorResponse(error, "Unauthorized");
+        return sendErrorResponse(res, { statusCode, message, errors });
+    }
+};
+
+export const updateCurrentUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return sendErrorResponse(res, {
+                statusCode: 400,
+                message: "User ID is missing"
+            });
+        }
+
+        const user = await updateCurrentUserService(userId, req.body);
+
+        return sendSuccessResponse(res, {
+            message: "Account updated successfully",
+            data: { user }
+        });
+    } catch (error) {
+        const { statusCode, message, errors } = getErrorResponse(error, "Failed to update account");
+        return sendErrorResponse(res, { statusCode, message, errors });
+    }
+};
+
+export const deleteCurrentUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return sendErrorResponse(res, {
+                statusCode: 400,
+                message: "User ID is missing"
+            });
+        }
+
+        await deleteCurrentUserService(userId);
+        clearSessionCookies(res);
+
+        return sendSuccessResponse(res, {
+            message: "Account deleted successfully"
+        });
+    } catch (error) {
+        const { statusCode, message, errors } = getErrorResponse(error, "Failed to delete account");
+        return sendErrorResponse(res, { statusCode, message, errors });
+    }
+};
+
+export const uploadCurrentUserAvatar = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return sendErrorResponse(res, {
+                statusCode: 400,
+                message: "User ID is missing"
+            });
+        }
+
+        const { imageData } = req.body;
+        const user = await uploadCurrentUserAvatarService(userId, imageData);
+
+        return sendSuccessResponse(res, {
+            message: "Avatar uploaded successfully",
+            data: { user }
+        });
+    } catch (error) {
+        const { statusCode, message, errors } = getErrorResponse(error, "Failed to upload avatar");
+        return sendErrorResponse(res, { statusCode, message, errors });
+    }
+};
+
+export const logoutCurrentUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return sendErrorResponse(res, {
+                statusCode: 400,
+                message: "User ID is missing"
+            });
+        }
+
+        await logoutCurrentUserService(userId);
+        clearSessionCookies(res);
+
+        return sendSuccessResponse(res, {
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        const { statusCode, message, errors } = getErrorResponse(error, "Failed to log out");
         return sendErrorResponse(res, { statusCode, message, errors });
     }
 };
