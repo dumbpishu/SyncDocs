@@ -11,7 +11,7 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../utils/appError";
 import { uploadImageToCloudinary } from "./cloudinary.service";
 
-const OTP_EXPIRY_IN_MS = 5 * 60 * 1000;
+const OTP_EXPIRY_IN_MS = 1 * 60 * 1000;
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
