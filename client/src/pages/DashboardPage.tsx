@@ -199,15 +199,15 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1560px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f8fbff_45%,#edf4ff_100%)] p-7 shadow-[0_28px_65px_rgba(15,23,42,0.09)]">
+      <section className="overflow-hidden rounded-[36px] border border-[#dbe3ee] bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-7 shadow-[0_28px_60px_rgba(15,23,42,0.08)]">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#667085]">Dashboard</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#98a2b3]">Dashboard</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-[#101828] sm:text-5xl">
               {user?.fullName || user?.username || "Workspace"}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667085]">
-              Create, manage, and share documents with full visibility across owned and shared work.
+              Create, open, and manage documents across owned, editor, and viewer access from one workspace.
             </p>
           </div>
 
@@ -215,13 +215,13 @@ export default function DashboardPage() {
             <button
               onClick={handleCreateDocument}
               disabled={isCreating}
-              className="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f172a] disabled:opacity-60"
+              className="cursor-pointer rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f172a] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isCreating ? "Creating..." : "New document"}
             </button>
             <Link
               to="/account"
-              className="rounded-xl border border-[#d0d5dd] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
+              className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
             >
               Account
             </Link>
@@ -280,16 +280,18 @@ export default function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-[30px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
+          <section className="rounded-[32px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-[#101828]">Selected document</p>
-                <p className="mt-1 text-sm text-[#667085]">{selectedOwnedDocument?.title ?? "Select a document"}</p>
+                <p className="text-sm font-semibold text-[#101828]">Manage document</p>
+                <p className="mt-1 text-sm text-[#667085]">
+                  {selectedOwnedDocument?.title ?? "Select an owned document to edit access and rename it."}
+                </p>
               </div>
               {selectedOwnedDocument ? (
                 <button
                   onClick={() => navigate(`/documents/${selectedOwnedDocument._id}`)}
-                  className="rounded-xl bg-[#111827] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
+                  className="cursor-pointer rounded-xl bg-[#111827] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
                 >
                   Open
                 </button>
@@ -310,7 +312,7 @@ export default function DashboardPage() {
                     <button
                       onClick={handleRenameDocument}
                       disabled={isManaging || normalizeDocumentTitle(renameDraft) === selectedOwnedDocument.title}
-                      className="rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#0f172a] disabled:opacity-60"
+                      className="cursor-pointer rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#0f172a] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       Save
                     </button>
@@ -330,7 +332,7 @@ export default function DashboardPage() {
                       <select
                         value={inviteRole}
                         onChange={(event) => setInviteRole(event.target.value as CollaboratorRole)}
-                        className="rounded-xl border border-[#d0d5dd] bg-[#fcfcfd] px-4 py-3 text-sm text-[#101828] outline-none transition focus:border-[#274690]"
+                        className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-[#fcfcfd] px-4 py-3 text-sm text-[#101828] outline-none transition focus:border-[#274690]"
                       >
                         <option value="viewer">Viewer</option>
                         <option value="editor">Editor</option>
@@ -338,7 +340,7 @@ export default function DashboardPage() {
                       <button
                         onClick={handleAddCollaborator}
                         disabled={isManaging || !inviteEmail.trim()}
-                        className="rounded-xl bg-[#274690] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1d4f91] disabled:opacity-60"
+                        className="cursor-pointer rounded-xl bg-[#274690] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1d4f91] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Add
                       </button>
@@ -381,7 +383,7 @@ export default function DashboardPage() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#dbe3ee] bg-white p-4 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
+    <div className="rounded-2xl border border-[#dbe3ee] bg-white p-4 shadow-[0_12px_24px_rgba(15,23,42,0.05)]">
       <p className="text-3xl font-semibold tracking-tight text-[#101828]">{value}</p>
       <p className="mt-2 text-sm text-[#667085]">{label}</p>
     </div>
@@ -408,8 +410,13 @@ function DocumentSection({
   onOpen: (documentId: string) => void;
 }) {
   return (
-    <section className="rounded-[30px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
-      <p className="text-sm font-semibold text-[#101828]">{title}</p>
+    <section className="rounded-[32px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-[#101828]">{title}</p>
+        <span className="rounded-full bg-[#f2f4f7] px-3 py-1 text-[11px] font-semibold text-[#667085]">
+          {documents.length}
+        </span>
+      </div>
       <div className="mt-4 space-y-3">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, index) => (
@@ -423,7 +430,7 @@ function DocumentSection({
               <article
                 key={document._id}
                 onClick={() => onSelect(document)}
-                className={`rounded-2xl border p-4 transition ${
+                className={`cursor-pointer rounded-2xl border p-4 transition ${
                   isSelected
                     ? "border-[#aac0e8] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] shadow-[0_16px_28px_rgba(39,70,144,0.10)]"
                     : "border-[#e4e7ec] bg-[#fcfcfd] hover:border-[#cfd6e3] hover:shadow-[0_14px_24px_rgba(15,23,42,0.05)]"
@@ -448,7 +455,7 @@ function DocumentSection({
                       event.stopPropagation();
                       onOpen(document._id);
                     }}
-                    className="rounded-xl border border-[#d0d5dd] bg-white px-3 py-2 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
+                    className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-white px-3 py-2 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
                   >
                     Open
                   </button>
@@ -486,7 +493,7 @@ function CollaboratorManagerRow({
           value={collaborator.role}
           onChange={(event) => onRoleChange(collaborator.user._id, event.target.value as CollaboratorRole)}
           disabled={disabled}
-          className="rounded-xl border border-[#d0d5dd] bg-white px-4 py-2 text-sm text-[#344054] outline-none transition focus:border-[#274690] disabled:opacity-50"
+          className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-white px-4 py-2 text-sm text-[#344054] outline-none transition focus:border-[#274690] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <option value="viewer">Viewer</option>
           <option value="editor">Editor</option>
@@ -495,7 +502,7 @@ function CollaboratorManagerRow({
           type="button"
           onClick={() => onRemove(collaborator.user._id)}
           disabled={disabled}
-          className="rounded-xl border border-[#f0d5dd] bg-[#fff7f8] px-4 py-2 text-sm font-semibold text-[#b42318] transition hover:bg-[#fff1f3] disabled:opacity-50"
+          className="cursor-pointer rounded-xl border border-[#f0d5dd] bg-[#fff7f8] px-4 py-2 text-sm font-semibold text-[#b42318] transition hover:bg-[#fff1f3] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Remove
         </button>

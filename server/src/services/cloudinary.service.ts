@@ -1,12 +1,16 @@
 import crypto from "crypto";
 import { AppError } from "../utils/appError";
 
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-const apiKey = process.env.CLOUDINARY_API_KEY;
-const apiSecret = process.env.CLOUDINARY_API_SECRET;
-const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
+const getCloudinaryConfig = () => ({
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+    apiKey: process.env.CLOUDINARY_API_KEY?.trim(),
+    apiSecret: process.env.CLOUDINARY_API_SECRET?.trim(),
+    uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET?.trim(),
+});
 
 export const uploadImageToCloudinary = async (imageData: string, folder: string) => {
+    const { cloudName, apiKey, apiSecret, uploadPreset } = getCloudinaryConfig();
+
     if (!cloudName) {
         throw new AppError(500, "Cloudinary is not configured: CLOUDINARY_CLOUD_NAME is missing");
     }

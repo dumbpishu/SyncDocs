@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -37,6 +37,7 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
+  FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
@@ -195,6 +196,7 @@ export function CollaborativeLexicalEditor({
   onCursorChange,
 }: CollaborativeLexicalEditorProps) {
   const initialSerializedContent = normalizeSerializedContent(serializedContent);
+  const documentMetrics = useMemo(() => getDocumentMetrics(serializedContent), [serializedContent]);
   const syncStateRef = useRef<SyncState>({
     isApplyingRemote: false,
     lastSerialized: initialSerializedContent,
@@ -224,7 +226,7 @@ export function CollaborativeLexicalEditor({
   };
 
   return (
-    <div className="relative overflow-hidden rounded-[24px] border border-[#e4e7ec] bg-[linear-gradient(180deg,#fbfcfe_0%,#ffffff_18%)]">
+    <div className="relative overflow-hidden rounded-[28px] border border-[#e4e7ec] bg-[linear-gradient(180deg,#fcfdff_0%,#ffffff_14%)] shadow-[0_18px_34px_rgba(15,23,42,0.06)]">
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin canEdit={canEdit} />
         <EditorContentSync
@@ -235,14 +237,25 @@ export function CollaborativeLexicalEditor({
           onCursorChange={onCursorChange}
         />
 
-        <div className="relative min-h-[calc(100vh-10rem)] px-10 py-8">
+        <div className="border-b border-[#eef2f6] bg-[#fcfcfd] px-6 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <span className="rounded-full bg-[#f2f4f7] px-3 py-1.5 font-medium text-[#344054]">
+              {canEdit ? "Editing enabled" : "View only"}
+            </span>
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#98a2b3]">
+              Collaborative editor
+            </span>
+          </div>
+        </div>
+
+        <div className="relative min-h-[calc(100vh-7rem)] px-8 py-8 sm:px-10">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="syncdocs-editor-content min-h-[calc(100vh-12rem)] resize-none text-[16px] leading-8 text-[#1f2937] outline-none" />
+              <ContentEditable className="syncdocs-editor-content min-h-[calc(100vh-10rem)] resize-none text-[16px] leading-8 text-[#1f2937] outline-none" />
             }
             placeholder={
-              <div className="pointer-events-none absolute left-10 top-8 text-sm text-[#98a2b3]">
-                Write
+              <div className="pointer-events-none absolute left-8 top-8 text-sm text-[#98a2b3] sm:left-10">
+                Start writing your document
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
@@ -284,6 +297,20 @@ export function CollaborativeLexicalEditor({
             ))}
           </div>
         </div>
+
+        <div className="border-t border-[#eef2f6] bg-[#fcfcfd] px-6 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[#667085]">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-[#f2f4f7] px-3 py-1.5 font-medium text-[#344054]">
+                {documentMetrics.words} words
+              </span>
+              <span className="rounded-full bg-[#f2f4f7] px-3 py-1.5 font-medium text-[#344054]">
+                {documentMetrics.characters} characters
+              </span>
+            </div>
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#98a2b3]">Live document</span>
+          </div>
+        </div>
       </LexicalComposer>
     </div>
   );
@@ -307,6 +334,7 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [textColor, setTextColor] = useState("#243640");
+  const [highlightColor, setHighlightColor] = useState("#fff2a8");
 
   useEffect(() => {
     return editor.registerCommand(
@@ -398,6 +426,22 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
     });
   };
 
+  const applyHighlightColor = (nextColor: string) => {
+    setHighlightColor(nextColor);
+
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if (!$isRangeSelection(selection)) {
+        return;
+      }
+
+      $patchStyleText(selection, {
+        "background-color": nextColor,
+      });
+    });
+  };
+
   const handleInsertImage = () => {
     const source = window.prompt("Paste an image URL");
     if (!source?.trim()) {
@@ -436,48 +480,93 @@ function ToolbarPlugin({ canEdit }: { canEdit: boolean }) {
   };
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-[#e4e7ec] bg-white/92 px-4 py-3 backdrop-blur">
-      <ToolbarButton label="Undo" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={!canEdit || !canUndo} />
-      <ToolbarButton label="Redo" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={!canEdit || !canRedo} />
-      <ToolbarDivider />
-      <ToolbarButton label="P" onClick={() => applyBlockType("paragraph")} disabled={!canEdit} />
-      <ToolbarButton label="H1" onClick={() => applyBlockType("h1")} disabled={!canEdit} />
-      <ToolbarButton label="H2" onClick={() => applyBlockType("h2")} disabled={!canEdit} />
-      <ToolbarButton label="Quote" onClick={() => applyBlockType("quote")} disabled={!canEdit} />
-      <ToolbarButton label="Code block" onClick={() => applyBlockType("code")} disabled={!canEdit} />
-      <ToolbarDivider />
-      <ToolbarButton label="B" active={isBold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")} disabled={!canEdit} />
-      <ToolbarButton label="I" active={isItalic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")} disabled={!canEdit} />
-      <ToolbarButton label="U" active={isUnderline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")} disabled={!canEdit} />
-      <ToolbarButton label="S" active={isStrikethrough} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")} disabled={!canEdit} />
-      <ToolbarButton label="Inline code" active={isCode} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")} disabled={!canEdit} />
-      <label className="flex items-center gap-2 rounded-xl bg-[#f8fafc] px-3 py-2 text-xs font-semibold text-[#475467]">
-        Color
-        <input
-          type="color"
-          value={textColor}
-          onChange={(event) => applyTextColor(event.target.value)}
-          disabled={!canEdit}
-          className="h-6 w-6 cursor-pointer rounded-full border-0 bg-transparent p-0 disabled:cursor-not-allowed"
-          title="Change text color"
-        />
-      </label>
-      <ToolbarDivider />
-      <ToolbarButton label="Bullets" onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
-      <ToolbarButton label="Numbers" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
-      <ToolbarButton label="Checklist" onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)} disabled={!canEdit} />
-      <ToolbarButton label="Clear list" onClick={() => editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined)} disabled={!canEdit} />
-      <ToolbarDivider />
-      <ToolbarButton
-        label="Table"
-        onClick={() =>
-          editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: "3", rows: "3", includeHeaders: true })
-        }
-        disabled={!canEdit}
-      />
-      <ToolbarButton label="Link" onClick={toggleLink} disabled={!canEdit} />
-      <ToolbarButton label="Image URL" onClick={handleInsertImage} disabled={!canEdit} />
-      <ToolbarButton label="Upload image" onClick={handleUploadImage} disabled={!canEdit} />
+    <div className="sticky top-0 z-10 border-b border-[#e4e7ec] bg-white/94 px-4 py-4 backdrop-blur">
+      <div className="flex flex-wrap items-center gap-3">
+        <ToolbarGroup label="History">
+          <ToolbarButton label="Undo" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} disabled={!canEdit || !canUndo} />
+          <ToolbarButton label="Redo" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} disabled={!canEdit || !canRedo} />
+        </ToolbarGroup>
+
+        <ToolbarGroup label="Text">
+          <ToolbarButton label="P" onClick={() => applyBlockType("paragraph")} disabled={!canEdit} />
+          <ToolbarButton label="H1" onClick={() => applyBlockType("h1")} disabled={!canEdit} />
+          <ToolbarButton label="H2" onClick={() => applyBlockType("h2")} disabled={!canEdit} />
+          <ToolbarButton label="Quote" onClick={() => applyBlockType("quote")} disabled={!canEdit} />
+          <ToolbarButton label="Code" onClick={() => applyBlockType("code")} disabled={!canEdit} />
+        </ToolbarGroup>
+
+        <ToolbarGroup label="Format">
+          <ToolbarButton label="B" active={isBold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")} disabled={!canEdit} />
+          <ToolbarButton label="I" active={isItalic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")} disabled={!canEdit} />
+          <ToolbarButton label="U" active={isUnderline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")} disabled={!canEdit} />
+          <ToolbarButton label="S" active={isStrikethrough} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")} disabled={!canEdit} />
+          <ToolbarButton label="Inline code" active={isCode} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")} disabled={!canEdit} />
+          <label className="flex items-center gap-2 rounded-xl border border-[#e4e7ec] bg-white px-3 py-2 text-xs font-semibold text-[#475467]">
+            Color
+            <input
+              type="color"
+              value={textColor}
+              onChange={(event) => applyTextColor(event.target.value)}
+              disabled={!canEdit}
+              className="h-6 w-6 cursor-pointer rounded-full border-0 bg-transparent p-0 disabled:cursor-not-allowed"
+              title="Change text color"
+            />
+          </label>
+          <label className="flex items-center gap-2 rounded-xl border border-[#e4e7ec] bg-white px-3 py-2 text-xs font-semibold text-[#475467]">
+            Highlight
+            <input
+              type="color"
+              value={highlightColor}
+              onChange={(event) => applyHighlightColor(event.target.value)}
+              disabled={!canEdit}
+              className="h-6 w-6 cursor-pointer rounded-full border-0 bg-transparent p-0 disabled:cursor-not-allowed"
+              title="Highlight selected text"
+            />
+          </label>
+        </ToolbarGroup>
+
+        <ToolbarGroup label="Structure">
+          <ToolbarButton label="Bullets" onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
+          <ToolbarButton label="Numbers" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} disabled={!canEdit} />
+          <ToolbarButton label="Checklist" onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)} disabled={!canEdit} />
+          <ToolbarButton label="Clear list" onClick={() => editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined)} disabled={!canEdit} />
+          <ToolbarButton
+            label="Table"
+            onClick={() =>
+              editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: "3", rows: "3", includeHeaders: true })
+            }
+            disabled={!canEdit}
+          />
+        </ToolbarGroup>
+
+        <ToolbarGroup label="Media">
+          <ToolbarButton label="Link" onClick={toggleLink} disabled={!canEdit} />
+          <ToolbarButton label="Image URL" onClick={handleInsertImage} disabled={!canEdit} />
+          <ToolbarButton label="Upload image" onClick={handleUploadImage} disabled={!canEdit} />
+        </ToolbarGroup>
+
+        <ToolbarGroup label="Align">
+          <ToolbarButton label="Left" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")} disabled={!canEdit} />
+          <ToolbarButton label="Center" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")} disabled={!canEdit} />
+          <ToolbarButton label="Right" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")} disabled={!canEdit} />
+          <ToolbarButton label="Justify" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")} disabled={!canEdit} />
+        </ToolbarGroup>
+      </div>
+    </div>
+  );
+}
+
+function ToolbarGroup({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#e4e7ec] bg-[linear-gradient(180deg,#fcfcfd_0%,#f8fafc_100%)] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+      <span className="px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#98a2b3]">{label}</span>
+      {children}
     </div>
   );
 }
@@ -498,10 +587,10 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+      className={`cursor-pointer rounded-xl px-3 py-2 text-xs font-semibold transition ${
         active
           ? "bg-[#111827] text-white shadow-[0_8px_16px_rgba(17,24,39,0.18)]"
-          : "bg-[#f8fafc] text-[#475467] hover:bg-[#eef2f7]"
+          : "bg-white text-[#475467] hover:bg-[#eef2f7]"
       } disabled:cursor-not-allowed disabled:opacity-50`}
     >
       {label}
@@ -509,12 +598,45 @@ function ToolbarButton({
   );
 }
 
-function ToolbarDivider() {
-  return <div className="h-6 w-px bg-[#e4e7ec]" />;
-}
-
 function isHexColor(value?: string) {
   return Boolean(value && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value));
+}
+
+function getDocumentMetrics(serializedContent: string) {
+  const plainText = extractPlainText(serializedContent);
+  const trimmedText = plainText.trim();
+
+  return {
+    words: trimmedText ? trimmedText.split(/\s+/).length : 0,
+    characters: plainText.length,
+  };
+}
+
+function extractPlainText(serializedContent: string) {
+  if (!serializedContent) return "";
+
+  try {
+    const parsedContent = JSON.parse(serializedContent);
+    const textParts: string[] = [];
+
+    const walkNode = (node: unknown) => {
+      if (!node || typeof node !== "object") return;
+
+      const currentNode = node as { text?: string; children?: unknown[] };
+      if (typeof currentNode.text === "string") {
+        textParts.push(currentNode.text);
+      }
+
+      if (Array.isArray(currentNode.children)) {
+        currentNode.children.forEach(walkNode);
+      }
+    };
+
+    walkNode(parsedContent?.root);
+    return textParts.join(" ").replace(/\s+/g, " ").trim();
+  } catch {
+    return serializedContent;
+  }
 }
 
 function EditorContentSync({

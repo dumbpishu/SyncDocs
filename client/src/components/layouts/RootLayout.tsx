@@ -18,40 +18,52 @@ export default function RootLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(39,70,144,0.08),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(56,189,248,0.08),_transparent_24%),linear-gradient(180deg,#f8fbff_0%,#f2f5f9_100%)] text-[#142033]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(199,210,254,0.3),_transparent_24%),radial-gradient(circle_at_top_right,_rgba(186,230,253,0.26),_transparent_20%),linear-gradient(180deg,#fafbfc_0%,#f3f5f7_100%)] text-[#142033]">
       <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute left-[-8rem] top-[-6rem] h-72 w-72 rounded-full bg-[#dbeafe] blur-3xl" />
-        <div className="absolute right-[-6rem] top-10 h-64 w-64 rounded-full bg-[#e0f2fe] blur-3xl" />
+        <div className="absolute left-[-8rem] top-[-6rem] h-72 w-72 rounded-full bg-[#e8eefc] blur-3xl" />
+        <div className="absolute right-[-6rem] top-10 h-64 w-64 rounded-full bg-[#edf6fb] blur-3xl" />
       </div>
 
       <header className="sticky top-0 z-30 px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1560px] items-center justify-between rounded-[24px] border border-white/80 bg-white/86 px-5 py-3.5 shadow-[0_20px_50px_rgba(15,23,42,0.10)] backdrop-blur">
+        <div className="mx-auto flex max-w-[1560px] items-center justify-between rounded-[26px] border border-white/90 bg-white/92 px-5 py-3.5 shadow-[0_18px_42px_rgba(15,23,42,0.08)] backdrop-blur">
           <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#111827,#274690)] text-sm font-semibold text-white shadow-[0_12px_28px_rgba(39,70,144,0.24)]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#0f172a,#334155)] text-sm font-semibold text-white shadow-[0_12px_26px_rgba(15,23,42,0.16)]">
               S
             </div>
-            <div>
+            <div className="flex flex-col">
               <p className="text-base font-semibold tracking-tight text-[#101828]">SyncDocs</p>
-              <p className="text-xs text-[#667085]">{isEditorRoute ? "Professional document editor" : "Collaborative workspace"}</p>
+              <p className="text-xs text-[#98a2b3]">{user ? "Workspace" : "Collaborative documents"}</p>
             </div>
           </Link>
 
-          <div className="hidden items-center gap-7 lg:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-[#eaecf0] bg-[#f8fafc] p-1 lg:flex">
             {user ? (
               <>
-                <Link to="/dashboard" className="text-sm font-semibold text-[#475467] transition hover:text-[#101828]">
+                <Link
+                  to="/dashboard"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-[#475467] transition hover:bg-white hover:text-[#101828]"
+                >
                   Dashboard
                 </Link>
-                <Link to="/account" className="text-sm font-semibold text-[#475467] transition hover:text-[#101828]">
+                <Link
+                  to="/account"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-[#475467] transition hover:bg-white hover:text-[#101828]"
+                >
                   Account
                 </Link>
               </>
             ) : (
               <>
-                <a href="/#features" className="text-sm font-semibold text-[#475467] transition hover:text-[#101828]">
+                <a
+                  href="/#features"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-[#475467] transition hover:bg-white hover:text-[#101828]"
+                >
                   Features
                 </a>
-                <a href="/#security" className="text-sm font-semibold text-[#475467] transition hover:text-[#101828]">
+                <a
+                  href="/#security"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-[#475467] transition hover:bg-white hover:text-[#101828]"
+                >
                   Security
                 </a>
               </>
@@ -75,20 +87,20 @@ export default function RootLayout() {
                   )}
                   <div>
                     <p className="text-sm font-semibold text-[#101828]">{user.username}</p>
-                    <p className="text-xs text-[#667085]">Signed in</p>
+                    <p className="text-xs text-[#98a2b3]">{isEditorRoute ? "Editing session" : "Signed in"}</p>
                   </div>
                 </div>
 
                 <Link
                   to={isEditorRoute ? "/dashboard" : "/account"}
-                  className="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
+                  className="cursor-pointer rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(17,24,39,0.14)] transition hover:bg-[#0f172a]"
                 >
-                  {isEditorRoute ? "Dashboard" : "Manage account"}
+                  {isEditorRoute ? "Dashboard" : "Account"}
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-xl border border-[#d0d5dd] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
+                  className="cursor-pointer rounded-xl border border-[#d0d5dd] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] transition hover:bg-[#f8fafc]"
                 >
                   Logout
                 </button>
@@ -96,7 +108,7 @@ export default function RootLayout() {
             ) : (
               <Link
                 to="/login"
-                className="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f172a]"
+                className="cursor-pointer rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(17,24,39,0.14)] transition hover:bg-[#0f172a]"
               >
                 Sign in
               </Link>

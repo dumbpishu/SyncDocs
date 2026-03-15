@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const titleSchema = z.string().trim().min(1).max(255);
-const contentSchema = z.string().max(200000);
+const contentSchema = z.string().max(50_000_000);
 const roleSchema = z.enum(["editor", "viewer"]);
 
 export const createDocumentSchema = z.object({

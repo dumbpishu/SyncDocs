@@ -34,35 +34,42 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <div className="mb-8">
-        <h2 className="text-3xl font-semibold tracking-tight text-[#2f2f2b] sm:text-4xl">Sign in</h2>
-        <p className="mt-3 text-sm leading-6 text-[#787774]">Use your email to receive a one-time code.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#98a2b3]">Sign in</p>
+        <h2 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-[#101828] sm:text-5xl">
+          Enter your email to continue.
+        </h2>
+        <p className="mt-4 max-w-md text-sm leading-7 text-[#667085]">
+          We'll send a one-time code so you can access the workspace without a password.
+        </p>
       </div>
 
-      <label className="mb-2 block text-sm font-medium text-[#37352f]" htmlFor="email">
-        Email
-      </label>
-      <input
-        id="email"
-        type="email"
-        placeholder="you@example.com"
-        className="w-full rounded-xl border border-[#dfddd7] bg-white px-4 py-3 text-[#2f2f2b] outline-none transition focus:border-[#b8b4ac]"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-      />
+      <div className="rounded-[24px] border border-[#e4e7ec] bg-white p-6 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+        <label className="mb-2 block text-sm font-medium text-[#344054]" htmlFor="email">
+          Work email
+        </label>
+        <input
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          className="w-full rounded-xl border border-[#d0d5dd] bg-[#fcfcfd] px-4 py-3 text-[#101828] outline-none transition focus:border-[#274690]"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
 
-      {error ? (
-        <p className="mt-3 rounded-xl border border-[#ead5d1] bg-[#fff8f7] px-4 py-3 text-sm text-[#8a3c2f]">
-          {error}
-        </p>
-      ) : null}
+        {error ? (
+          <p className="mt-4 rounded-xl border border-[#f0d5dd] bg-[#fff7f8] px-4 py-3 text-sm text-[#b42318]">
+            {error}
+          </p>
+        ) : null}
 
-      <button
-        onClick={handleSendOtp}
-        disabled={loading}
-        className="mt-6 w-full rounded-xl bg-[#2f2f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20201d] disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {loading ? "Sending..." : "Send code"}
-      </button>
+        <button
+          onClick={handleSendOtp}
+          disabled={loading}
+          className="mt-6 w-full cursor-pointer rounded-xl bg-[#111827] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#0f172a] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {loading ? "Sending..." : "Send code"}
+        </button>
+      </div>
     </AuthLayout>
   );
 }
