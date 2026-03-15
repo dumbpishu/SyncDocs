@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 export default function LandingPage() {
   return (
     <div className="pb-20">
-      <section className="mx-auto grid max-w-[1540px] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_460px] lg:px-8 lg:py-24">
+      <section className="mx-auto grid max-w-[1560px] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_500px] lg:px-8 lg:py-24">
         <div className="flex flex-col justify-center">
-          <span className="inline-flex w-fit rounded-full border border-[#dbe3ee] bg-white px-3 py-1 text-sm font-medium text-[#475467] shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+          <span className="inline-flex w-fit rounded-full border border-[#dbe3ee] bg-white px-3 py-1 text-sm font-medium text-[#475467] shadow-[0_10px_22px_rgba(15,23,42,0.05)]">
             Real-time collaboration
           </span>
-          <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-tight text-[#101828] sm:text-6xl lg:text-7xl">
-            Documents that feel fast, structured, and shared by default.
+          <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-[-0.04em] text-[#101828] sm:text-6xl lg:text-7xl">
+            Documents built for focused teams and faster decisions.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[#667085]">
-            SyncDocs brings editing, collaboration, permissions, PDF export, and account management into a focused workspace built for teams.
+            SyncDocs combines live editing, sharing controls, PDF export, secure sign-in, and account management in a polished collaborative workspace.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -31,16 +31,16 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-10 grid max-w-2xl gap-4 sm:grid-cols-3">
-            <StatCard label="Editing" value="Live" />
-            <StatCard label="Sharing" value="Role-based" />
-            <StatCard label="Export" value="PDF" />
+            <StatCard label="Editing" value="Realtime" />
+            <StatCard label="Access" value="Role-based" />
+            <StatCard label="Export" value="PDF ready" />
           </div>
         </div>
 
         <div className="relative">
-          <div className="absolute inset-0 rounded-[32px] bg-[linear-gradient(135deg,rgba(39,70,144,0.12),rgba(17,24,39,0.04))] blur-3xl" />
-          <div className="relative rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
-            <div className="rounded-[24px] border border-[#e4e7ec] bg-white p-5">
+          <div className="absolute inset-0 rounded-[36px] bg-[linear-gradient(135deg,rgba(39,70,144,0.12),rgba(14,165,233,0.08))] blur-3xl" />
+          <div className="relative rounded-[36px] border border-[#dbe3ee] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_28px_70px_rgba(15,23,42,0.14)]">
+            <div className="rounded-[28px] border border-[#e4e7ec] bg-white p-5">
               <div className="flex items-center justify-between border-b border-[#eef2f7] pb-4">
                 <div>
                   <p className="text-sm font-semibold text-[#101828]">Quarterly planning</p>
@@ -53,8 +53,8 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 pt-5 lg:grid-cols-[minmax(0,1fr)_180px]">
-                <div className="rounded-[20px] border border-[#e4e7ec] bg-[#fcfdff] p-4">
+              <div className="grid gap-4 pt-5 lg:grid-cols-[minmax(0,1fr)_200px]">
+                <div className="rounded-[22px] border border-[#e4e7ec] bg-[#fcfdff] p-5">
                   <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#98a2b3]">
                     Editor
                   </div>
@@ -62,8 +62,10 @@ export default function LandingPage() {
                     <div className="h-3 w-3/4 rounded-full bg-[#111827]" />
                     <div className="h-3 w-full rounded-full bg-[#e9eef5]" />
                     <div className="h-3 w-11/12 rounded-full bg-[#e9eef5]" />
-                    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4">
-                      <p className="text-sm font-medium text-[#344054]">Comments, sharing, and access controls stay close to the document.</p>
+                    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
+                      <p className="text-sm font-medium leading-7 text-[#344054]">
+                        Comments, sharing, and access controls stay close to the document.
+                      </p>
                     </div>
                     <div className="h-3 w-10/12 rounded-full bg-[#e9eef5]" />
                     <div className="h-3 w-8/12 rounded-full bg-[#e9eef5]" />
@@ -80,11 +82,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-[1540px] px-4 py-4 sm:px-6 lg:px-8">
+      <section id="features" className="mx-auto max-w-[1560px] px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#98a2b3]">Features</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#101828]">
+              Everything needed for collaborative document work.
+            </h2>
+          </div>
+        </div>
+
         <div className="grid gap-4 lg:grid-cols-3">
           <FeatureCard
             title="Collaborative editing"
-            text="Edit documents together with live updates, presence, and shared access rules."
+            text="Edit documents together with live updates, presence, and server-enforced access rules."
           />
           <FeatureCard
             title="Document management"
@@ -92,26 +103,26 @@ export default function LandingPage() {
           />
           <FeatureCard
             title="Professional workflow"
-            text="Upload avatars, control account access, and export documents to PDF when needed."
+            text="Upload avatars, manage your account, and export polished documents to PDF."
           />
         </div>
       </section>
 
-      <section id="security" className="mx-auto max-w-[1540px] px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <div className="rounded-[28px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#111827_0%,#1d3557_52%,#274690_100%)] p-7 text-white shadow-[0_20px_50px_rgba(17,24,39,0.18)]">
-            <p className="text-sm font-semibold text-white/84">Security</p>
+      <section id="security" className="mx-auto max-w-[1560px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="rounded-[30px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#111827_0%,#1d3557_52%,#274690_100%)] p-7 text-white shadow-[0_22px_52px_rgba(17,24,39,0.20)]">
+            <p className="text-sm font-semibold text-white/80">Security</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">Built around controlled access.</h2>
-            <p className="mt-4 text-sm leading-7 text-white/88">
-              OTP sign-in, refresh-based sessions, protected routes, and server-enforced permissions keep the workspace simple and reliable.
+            <p className="mt-4 text-sm leading-7 text-white/84">
+              OTP sign-in, refresh-based sessions, protected routes, and role checks keep the workspace reliable without adding friction.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <InfoCard title="OTP login" text="Fast sign-in without passwords." />
-            <InfoCard title="Cookie sessions" text="Auth state stays server-backed and secure." />
-            <InfoCard title="Role checks" text="Owners, editors, and viewers are enforced on the server." />
-            <InfoCard title="Account controls" text="Profile updates, avatar upload, and logout are built in." />
+            <InfoCard title="Cookie sessions" text="Auth stays server-backed and secure." />
+            <InfoCard title="Role checks" text="Owners, editors, and viewers are enforced consistently." />
+            <InfoCard title="Account controls" text="Avatar upload, logout, and profile settings are built in." />
           </div>
         </div>
       </section>
@@ -121,7 +132,7 @@ export default function LandingPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+    <div className="rounded-2xl border border-[#dbe3ee] bg-white px-4 py-4 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
       <p className="text-xl font-semibold text-[#101828]">{value}</p>
       <p className="mt-1 text-sm text-[#667085]">{label}</p>
     </div>
@@ -138,7 +149,7 @@ function Avatar({ label }: { label: string }) {
 
 function MiniPanel({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-[20px] border border-[#e4e7ec] bg-[#fcfdff] p-4">
+    <div className="rounded-[22px] border border-[#e4e7ec] bg-[#fcfdff] p-4">
       <p className="text-sm font-semibold text-[#101828]">{title}</p>
       <div className="mt-3 space-y-2">
         {items.map((item) => (
@@ -153,7 +164,7 @@ function MiniPanel({ title, items }: { title: string; items: string[] }) {
 
 function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
+    <div className="rounded-[28px] border border-[#dde3ec] bg-white p-6 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
       <div className="mb-5 h-12 w-12 rounded-2xl bg-[linear-gradient(135deg,#e0ecff,#edf4ff)]" />
       <p className="text-xl font-semibold text-[#101828]">{title}</p>
       <p className="mt-3 text-sm leading-7 text-[#667085]">{text}</p>
@@ -163,7 +174,7 @@ function FeatureCard({ title, text }: { title: string; text: string }) {
 
 function InfoCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-[24px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
+    <div className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
       <p className="text-lg font-semibold text-[#101828]">{title}</p>
       <p className="mt-3 text-sm leading-7 text-[#667085]">{text}</p>
     </div>

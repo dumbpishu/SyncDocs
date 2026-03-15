@@ -33,6 +33,12 @@ type PendingDocumentUpdate = {
     title?: string;
 };
 
+type EffectiveDocumentState = {
+    content: string;
+    title: string;
+    version: number;
+};
+
 const participantPalette = [
     "#2563eb",
     "#059669",
@@ -85,6 +91,19 @@ const getRoomSnapshot = (documentId: string) => ({
     cursors: Array.from(roomCursors.get(documentId)?.values() ?? []),
 });
 
+const getEffectiveDocumentState = (
+    documentId: string,
+    document: { content?: string; title: string; version: number }
+): EffectiveDocumentState => {
+    const pendingUpdate = pendingDocumentUpdates.get(documentId);
+
+    return {
+        content: pendingUpdate?.content ?? document.content ?? "",
+        title: pendingUpdate?.title ?? document.title,
+        version: document.version,
+    };
+};
+
 const broadcastPresence = (io: Server, documentId: string) => {
     io.to(getRoomName(documentId)).emit("presence:update", getRoomSnapshot(documentId));
 };
@@ -115,7 +134,7 @@ const removeSocketFromDocumentRoom = (io: Server, socket: any) => {
     broadcastPresence(io, activeDocumentId);
 };
 
-const scheduleDocumentSave = (documentId: string) => {
+const scheduleDocumentSave = (io: Server, documentId: string) => {
     const existingTimer = saveTimers.get(documentId);
     if (existingTimer) {
         clearTimeout(existingTimer);
@@ -129,18 +148,31 @@ const scheduleDocumentSave = (documentId: string) => {
             return;
         }
 
-        await Document.findOneAndUpdate(
-            { _id: documentId, isDeleted: false },
-            {
-                ...(pendingUpdate.content !== undefined ? { content: pendingUpdate.content } : {}),
-                ...(pendingUpdate.title !== undefined ? { title: pendingUpdate.title } : {}),
-                $inc: { version: 1 },
-            }
-        );
+        try {
+            const updatedDocument = await Document.findOneAndUpdate(
+                { _id: documentId, isDeleted: false },
+                {
+                    ...(pendingUpdate.content !== undefined ? { content: pendingUpdate.content } : {}),
+                    ...(pendingUpdate.title !== undefined ? { title: pendingUpdate.title } : {}),
+                    $inc: { version: 1 },
+                },
+                { new: true }
+            );
 
-        pendingDocumentUpdates.delete(documentId);
-        saveTimers.delete(documentId);
-    }, 1000);
+            if (updatedDocument) {
+                io.to(getRoomName(documentId)).emit("document:saved", {
+                    documentId,
+                    content: updatedDocument.content ?? "",
+                    title: updatedDocument.title,
+                    version: updatedDocument.version,
+                    savedAt: new Date().toISOString(),
+                });
+            }
+        } finally {
+            pendingDocumentUpdates.delete(documentId);
+            saveTimers.delete(documentId);
+        }
+    }, 250);
 
     saveTimers.set(documentId, nextTimer);
 };
@@ -211,11 +243,13 @@ export const registerCollaborationServer = (httpServer: ReturnType<typeof create
             const cursors = roomCursors.get(documentId) ?? new Map<string, CursorPosition>();
             roomCursors.set(documentId, cursors);
 
+            const effectiveState = getEffectiveDocumentState(documentId, access.document);
+
             socket.emit("document:bootstrap", {
                 documentId,
-                content: access.document.content || "",
-                title: access.document.title,
-                version: access.document.version,
+                content: effectiveState.content,
+                title: effectiveState.title,
+                version: effectiveState.version,
                 role: access.role,
                 ...getRoomSnapshot(documentId),
             });
@@ -240,9 +274,9 @@ export const registerCollaborationServer = (httpServer: ReturnType<typeof create
                     ...pendingUpdate,
                     content,
                 });
-                scheduleDocumentSave(documentId);
+                scheduleDocumentSave(io, documentId);
 
-                socket.to(getRoomName(documentId)).emit("document:update", {
+                io.to(getRoomName(documentId)).emit("document:update", {
                     documentId,
                     content,
                     updatedBy: user._id,
@@ -267,9 +301,9 @@ export const registerCollaborationServer = (httpServer: ReturnType<typeof create
                     ...pendingUpdate,
                     title,
                 });
-                scheduleDocumentSave(documentId);
+                scheduleDocumentSave(io, documentId);
 
-                socket.to(getRoomName(documentId)).emit("document:title:update", {
+                io.to(getRoomName(documentId)).emit("document:title:update", {
                     documentId,
                     title,
                     updatedBy: user._id,

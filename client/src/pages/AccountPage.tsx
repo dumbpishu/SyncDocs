@@ -92,14 +92,14 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[28px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f8fbff_55%,#eef4ff_100%)] p-7 shadow-[0_24px_50px_rgba(15,23,42,0.08)]">
+    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f8fbff_45%,#edf4ff_100%)] p-7 shadow-[0_28px_60px_rgba(15,23,42,0.08)]">
         <Link to="/dashboard" className="text-sm font-medium text-[#667085] transition hover:text-[#101828]">
           Back
         </Link>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#101828]">Account</h1>
+        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-[#101828]">Account</h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667085]">
-          Update your profile information and avatar, or remove your account if needed.
+          Manage your profile information, avatar, and account settings from one place.
         </p>
       </section>
 
@@ -118,8 +118,8 @@ export default function AccountPage() {
         </div>
       )}
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="rounded-[30px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
           <p className="text-sm font-semibold text-[#101828]">Profile</p>
 
           <div className="mt-6 flex flex-col gap-6 lg:flex-row">
@@ -128,10 +128,10 @@ export default function AccountPage() {
                 <img
                   src={avatar}
                   alt={username || "Avatar"}
-                  className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-[0_12px_30px_rgba(15,23,42,0.12)]"
+                  className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-[0_14px_34px_rgba(15,23,42,0.14)]"
                 />
               ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[linear-gradient(135deg,#dbeafe,#e0f2fe)] text-3xl font-semibold text-[#274690] shadow-[0_12px_30px_rgba(39,70,144,0.16)]">
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[linear-gradient(135deg,#dbeafe,#e0f2fe)] text-3xl font-semibold text-[#274690] shadow-[0_14px_34px_rgba(39,70,144,0.16)]">
                   {(username || user?.username || "U").slice(0, 1).toUpperCase()}
                 </div>
               )}
@@ -151,9 +151,7 @@ export default function AccountPage() {
               >
                 {isUploadingAvatar ? "Uploading..." : "Upload avatar"}
               </button>
-              <p className="max-w-[220px] text-xs leading-6 text-[#98a2b3]">
-                PNG or JPG recommended.
-              </p>
+              <p className="max-w-[220px] text-xs leading-6 text-[#98a2b3]">PNG or JPG recommended.</p>
             </div>
 
             <div className="grid flex-1 gap-4">
@@ -193,7 +191,7 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <aside className="rounded-[26px] border border-[#f1d4da] bg-[linear-gradient(180deg,#fffafa_0%,#fff6f7_100%)] p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+        <aside className="rounded-[30px] border border-[#f1d4da] bg-[linear-gradient(180deg,#fffafa_0%,#fff6f7_100%)] p-6 shadow-[0_16px_34px_rgba(15,23,42,0.05)]">
           <p className="text-sm font-semibold text-[#912018]">Delete account</p>
           <p className="mt-3 text-sm leading-7 text-[#b54708]">
             This action removes your account, owned documents, and collaborator access.

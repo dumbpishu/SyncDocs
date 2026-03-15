@@ -115,9 +115,7 @@ export default function DashboardPage() {
   };
 
   const handleRenameDocument = async () => {
-    if (!selectedOwnedDocument) {
-      return;
-    }
+    if (!selectedOwnedDocument) return;
 
     try {
       setIsManaging(true);
@@ -138,9 +136,7 @@ export default function DashboardPage() {
   };
 
   const handleAddCollaborator = async () => {
-    if (!selectedOwnedDocument || !inviteEmail.trim()) {
-      return;
-    }
+    if (!selectedOwnedDocument || !inviteEmail.trim()) return;
 
     try {
       setIsManaging(true);
@@ -164,9 +160,7 @@ export default function DashboardPage() {
   };
 
   const handleRoleChange = async (collaboratorId: string, role: CollaboratorRole) => {
-    if (!selectedOwnedDocument) {
-      return;
-    }
+    if (!selectedOwnedDocument) return;
 
     try {
       setIsManaging(true);
@@ -185,9 +179,7 @@ export default function DashboardPage() {
   };
 
   const handleRemoveCollaborator = async (collaboratorId: string) => {
-    if (!selectedOwnedDocument) {
-      return;
-    }
+    if (!selectedOwnedDocument) return;
 
     try {
       setIsManaging(true);
@@ -206,16 +198,16 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[1540px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[28px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_52%,#edf4ff_100%)] p-7 text-[#101828] shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+    <div className="mx-auto flex w-full max-w-[1560px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f8fbff_45%,#edf4ff_100%)] p-7 shadow-[0_28px_65px_rgba(15,23,42,0.09)]">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#667085]">Dashboard</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-[#101828] sm:text-5xl">
               {user?.fullName || user?.username || "Workspace"}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#667085]">
-              Manage your documents, sharing settings, and access from one place.
+              Create, manage, and share documents with full visibility across owned and shared work.
             </p>
           </div>
 
@@ -251,7 +243,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.12fr)_390px]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_400px]">
         <div className="space-y-6">
           <DocumentSection
             title="Owned documents"
@@ -288,7 +280,7 @@ export default function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+          <section className="rounded-[30px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-[#101828]">Selected document</p>
@@ -368,7 +360,7 @@ export default function DashboardPage() {
                         />
                       ))
                     ) : (
-                      <div className="rounded-xl border border-dashed border-[#d0d5dd] bg-[#fcfcfd] px-4 py-5 text-sm text-[#667085]">
+                      <div className="rounded-2xl border border-dashed border-[#d0d5dd] bg-[#fcfcfd] px-4 py-5 text-sm text-[#667085]">
                         No collaborators.
                       </div>
                     )}
@@ -376,7 +368,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-[#d0d5dd] bg-[#fcfcfd] px-4 py-8 text-sm text-[#667085]">
+              <div className="mt-6 rounded-2xl border border-dashed border-[#d0d5dd] bg-[#fcfcfd] px-4 py-8 text-sm text-[#667085]">
                 Select an owned document to manage it.
               </div>
             )}
@@ -389,7 +381,7 @@ export default function DashboardPage() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#dbe3ee] bg-white p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+    <div className="rounded-2xl border border-[#dbe3ee] bg-white p-4 shadow-[0_12px_26px_rgba(15,23,42,0.05)]">
       <p className="text-3xl font-semibold tracking-tight text-[#101828]">{value}</p>
       <p className="mt-2 text-sm text-[#667085]">{label}</p>
     </div>
@@ -416,7 +408,7 @@ function DocumentSection({
   onOpen: (documentId: string) => void;
 }) {
   return (
-    <section className="rounded-[26px] border border-[#dde3ec] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+    <section className="rounded-[30px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
       <p className="text-sm font-semibold text-[#101828]">{title}</p>
       <div className="mt-4 space-y-3">
         {isLoading ? (
@@ -433,8 +425,8 @@ function DocumentSection({
                 onClick={() => onSelect(document)}
                 className={`rounded-2xl border p-4 transition ${
                   isSelected
-                    ? "border-[#aac0e8] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] shadow-[0_12px_24px_rgba(39,70,144,0.08)]"
-                    : "border-[#e4e7ec] bg-[#fcfcfd] hover:border-[#cfd6e3] hover:shadow-[0_10px_20px_rgba(15,23,42,0.04)]"
+                    ? "border-[#aac0e8] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] shadow-[0_16px_28px_rgba(39,70,144,0.10)]"
+                    : "border-[#e4e7ec] bg-[#fcfcfd] hover:border-[#cfd6e3] hover:shadow-[0_14px_24px_rgba(15,23,42,0.05)]"
                 }`}
               >
                 <div className="flex gap-4">
@@ -518,13 +510,15 @@ function StatusMessage({ tone, children }: { tone: "error" | "success"; children
       ? "border-[#f0d5dd] bg-[#fff7f8] text-[#b42318]"
       : "border-[#cce8d8] bg-[#f2fbf5] text-[#067647]";
 
-  return <div className={`rounded-2xl border px-4 py-3 text-sm shadow-[0_8px_20px_rgba(15,23,42,0.03)] ${toneClassName}`}>{children}</div>;
+  return (
+    <div className={`rounded-2xl border px-4 py-3 text-sm shadow-[0_10px_22px_rgba(15,23,42,0.03)] ${toneClassName}`}>
+      {children}
+    </div>
+  );
 }
 
 function extractPlainText(content: string) {
-  if (!content) {
-    return "";
-  }
+  if (!content) return "";
 
   try {
     const parsedContent = JSON.parse(content);

@@ -194,15 +194,17 @@ export function CollaborativeLexicalEditor({
   onSerializedChange,
   onCursorChange,
 }: CollaborativeLexicalEditorProps) {
+  const initialSerializedContent = normalizeSerializedContent(serializedContent);
   const syncStateRef = useRef<SyncState>({
     isApplyingRemote: false,
-    lastSerialized: normalizeSerializedContent(serializedContent),
+    lastSerialized: initialSerializedContent,
   });
 
   const initialConfig = {
     namespace: `syncdocs-${documentId}`,
     editable: canEdit,
     theme: editorTheme,
+    editorState: initialSerializedContent,
     onError(error: Error) {
       throw error;
     },

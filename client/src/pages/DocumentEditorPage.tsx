@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { deleteDocument, getDocumentById } from "../api/document.api";
+import { deleteDocument, getDocumentById, updateDocument } from "../api/document.api";
 import { CollaborativeLexicalEditor } from "../components/editor/CollaborativeLexicalEditor";
 import { useAuth } from "../context/AuthContext";
 import { getCollaborationSocket } from "../services/realtime";
@@ -12,9 +12,12 @@ export default function DocumentEditorPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const socket = useMemo(() => getCollaborationSocket(), []);
-  const updateDebounceRef = useRef<number | null>(null);
-  const titleBroadcastRef = useRef<number | null>(null);
   const lastBroadcastedTitleRef = useRef("");
+  const pendingContentRef = useRef<string | null>(null);
+  const pendingTitleRef = useRef<string | null>(null);
+  const latestContentRef = useRef("");
+  const latestTitleRef = useRef("");
+  const isPersistingRef = useRef(false);
 
   const [document, setDocument] = useState<DocumentRecord | null>(null);
   const [titleDraft, setTitleDraft] = useState("");
@@ -49,6 +52,10 @@ export default function DocumentEditorPage() {
       setTitleDraft(nextDocument.title);
       lastBroadcastedTitleRef.current = nextDocument.title;
       setSerializedContent(nextDocument.content ?? "");
+      latestContentRef.current = nextDocument.content ?? "";
+      latestTitleRef.current = nextDocument.title;
+      pendingContentRef.current = null;
+      pendingTitleRef.current = null;
       setError("");
     } catch (loadError) {
       setError(getApiErrorMessage(loadError, "Unable to load document."));
@@ -84,6 +91,10 @@ export default function DocumentEditorPage() {
       setSerializedContent(payload.content ?? "");
       setTitleDraft(payload.title ?? "");
       lastBroadcastedTitleRef.current = payload.title ?? "";
+      latestContentRef.current = payload.content ?? "";
+      latestTitleRef.current = payload.title ?? "";
+      pendingContentRef.current = null;
+      pendingTitleRef.current = null;
       setDocument((currentDocument) =>
         currentDocument
           ? {
@@ -108,6 +119,7 @@ export default function DocumentEditorPage() {
       if (payload.documentId !== id) return;
 
       setSerializedContent(payload.content ?? "");
+      latestContentRef.current = payload.content ?? "";
       setDocument((currentDocument) =>
         currentDocument ? { ...currentDocument, content: payload.content ?? "" } : currentDocument,
       );
@@ -118,8 +130,41 @@ export default function DocumentEditorPage() {
 
       setTitleDraft(payload.title ?? "");
       lastBroadcastedTitleRef.current = payload.title ?? "";
+      latestTitleRef.current = payload.title ?? "";
       setDocument((currentDocument) =>
         currentDocument ? { ...currentDocument, title: payload.title ?? "" } : currentDocument,
+      );
+    };
+
+    const handleDocumentSaved = (payload: {
+      documentId: string;
+      content: string;
+      title: string;
+      version: number;
+      savedAt: string;
+    }) => {
+      if (payload.documentId !== id) return;
+
+      setSerializedContent(payload.content ?? "");
+      setTitleDraft(payload.title ?? "");
+      lastBroadcastedTitleRef.current = payload.title ?? "";
+      latestContentRef.current = payload.content ?? "";
+      latestTitleRef.current = payload.title ?? "";
+      pendingContentRef.current = null;
+      pendingTitleRef.current = null;
+      setSaveState("saved");
+      setLastSyncedAt(
+        new Date(payload.savedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
+      );
+      setDocument((currentDocument) =>
+        currentDocument
+          ? {
+              ...currentDocument,
+              content: payload.content ?? "",
+              title: payload.title ?? currentDocument.title,
+              version: payload.version ?? currentDocument.version,
+            }
+          : currentDocument,
       );
     };
 
@@ -131,6 +176,7 @@ export default function DocumentEditorPage() {
     socket.on("presence:update", handlePresenceUpdate);
     socket.on("document:update", handleRemoteUpdate);
     socket.on("document:title:update", handleRemoteTitleUpdate);
+    socket.on("document:saved", handleDocumentSaved);
     socket.on("document:error", handleRealtimeError);
 
     return () => {
@@ -139,6 +185,7 @@ export default function DocumentEditorPage() {
       socket.off("presence:update", handlePresenceUpdate);
       socket.off("document:update", handleRemoteUpdate);
       socket.off("document:title:update", handleRemoteTitleUpdate);
+      socket.off("document:saved", handleDocumentSaved);
       socket.off("document:error", handleRealtimeError);
       socket.disconnect();
     };
@@ -156,27 +203,97 @@ export default function DocumentEditorPage() {
     };
   }, [id, socket]);
 
+  const flushPendingRealtimeChanges = async () => {
+    if (!id) return;
+    if (isPersistingRef.current) return;
+
+    const nextContent = pendingContentRef.current;
+    const nextTitle = pendingTitleRef.current;
+
+    if (nextContent === null && nextTitle === null) {
+      return;
+    }
+
+    const payload: { content?: string; title?: string } = {};
+
+    if (nextContent !== null) {
+      latestContentRef.current = nextContent;
+      payload.content = nextContent;
+    }
+
+    if (nextTitle !== null) {
+      latestTitleRef.current = nextTitle;
+      payload.title = nextTitle;
+    }
+
+    isPersistingRef.current = true;
+
+    try {
+      const updatedDocument = await updateDocument(id, payload);
+
+      if (nextContent !== null) {
+        socket.emit("document:update", {
+          documentId: id,
+          content: nextContent,
+        });
+        pendingContentRef.current = null;
+      }
+
+      if (nextTitle !== null) {
+        socket.emit("document:title:update", {
+          documentId: id,
+          title: nextTitle,
+        });
+        lastBroadcastedTitleRef.current = nextTitle;
+        pendingTitleRef.current = null;
+      }
+
+      if (updatedDocument) {
+        latestContentRef.current = updatedDocument.content ?? latestContentRef.current;
+        latestTitleRef.current = updatedDocument.title ?? latestTitleRef.current;
+        setSerializedContent(updatedDocument.content ?? "");
+        setTitleDraft(updatedDocument.title ?? "");
+        setSaveState("saved");
+        setLastSyncedAt(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
+        setDocument(updatedDocument);
+      }
+    } catch (flushError) {
+      setError(getApiErrorMessage(flushError, "Unable to save document changes."));
+    } finally {
+      isPersistingRef.current = false;
+    }
+  };
+
+  useEffect(() => {
+    if (!id || (!canEdit && !isOwner)) return;
+
+    const intervalId = window.setInterval(() => {
+      void flushPendingRealtimeChanges();
+    }, 5000);
+
+    const flushBeforeLeave = () => {
+      void flushPendingRealtimeChanges();
+    };
+
+    window.addEventListener("beforeunload", flushBeforeLeave);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("beforeunload", flushBeforeLeave);
+      void flushPendingRealtimeChanges();
+    };
+  }, [canEdit, id, isOwner, socket]);
+
   const handleRealtimeContentChange = (nextSerializedContent: string) => {
     if (!id || !canEdit) return;
 
     setSerializedContent(nextSerializedContent);
+    latestContentRef.current = nextSerializedContent;
+    pendingContentRef.current = nextSerializedContent;
     setSaveState("saving");
     setDocument((currentDocument) =>
       currentDocument ? { ...currentDocument, content: nextSerializedContent } : currentDocument,
     );
-
-    if (updateDebounceRef.current) {
-      window.clearTimeout(updateDebounceRef.current);
-    }
-
-    updateDebounceRef.current = window.setTimeout(() => {
-      socket.emit("document:update", {
-        documentId: id,
-        content: nextSerializedContent,
-      });
-      setSaveState("saved");
-      setLastSyncedAt(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
-    }, 1000);
   };
 
   useEffect(() => {
@@ -185,27 +302,9 @@ export default function DocumentEditorPage() {
     const normalizedTitle = titleDraft.trim() || "Untitled Document";
     if (normalizedTitle === lastBroadcastedTitleRef.current) return;
 
+    latestTitleRef.current = normalizedTitle;
+    pendingTitleRef.current = normalizedTitle;
     setSaveState("saving");
-
-    if (titleBroadcastRef.current) {
-      window.clearTimeout(titleBroadcastRef.current);
-    }
-
-    titleBroadcastRef.current = window.setTimeout(() => {
-      socket.emit("document:title:update", {
-        documentId: id,
-        title: normalizedTitle,
-      });
-      lastBroadcastedTitleRef.current = normalizedTitle;
-      setSaveState("saved");
-      setLastSyncedAt(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
-    }, 700);
-
-    return () => {
-      if (titleBroadcastRef.current) {
-        window.clearTimeout(titleBroadcastRef.current);
-      }
-    };
   }, [document, id, isOwner, socket, titleDraft]);
 
   const handleCursorChange = (cursor: { x: number; y: number; height: number } | null) => {
@@ -315,8 +414,8 @@ export default function DocumentEditorPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1580px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[28px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_52%,#edf4ff_100%)] p-6 text-[#101828] shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[32px] border border-[#dbe3ee] bg-[linear-gradient(135deg,#ffffff_0%,#f8fbff_45%,#edf4ff_100%)] p-6 text-[#101828] shadow-[0_28px_65px_rgba(15,23,42,0.09)]">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3 text-sm text-[#667085]">
@@ -363,7 +462,7 @@ export default function DocumentEditorPage() {
         ) : null}
       </section>
 
-      <section className="rounded-[28px] border border-[#dde3ec] bg-white p-3 shadow-[0_16px_36px_rgba(15,23,42,0.08)]">
+      <section className="rounded-[32px] border border-[#dde3ec] bg-white p-3 shadow-[0_18px_38px_rgba(15,23,42,0.08)]">
         <CollaborativeLexicalEditor
           key={document._id}
           documentId={document._id}
@@ -376,7 +475,7 @@ export default function DocumentEditorPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="rounded-[26px] border border-[#dde3ec] bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+        <div className="rounded-[28px] border border-[#dde3ec] bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
           <div className="flex flex-wrap items-center gap-3 text-sm text-[#667085]">
             <span className="rounded-full bg-[#f2f4f7] px-3 py-1.5 font-medium text-[#344054]">{participants.length} online</span>
             <span>{document.collaborators.length} collaborators</span>
@@ -384,7 +483,7 @@ export default function DocumentEditorPage() {
           </div>
         </div>
 
-        <div className="rounded-[26px] border border-[#dde3ec] bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+        <div className="rounded-[28px] border border-[#dde3ec] bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
           <p className="text-sm font-semibold text-[#101828]">Session</p>
           <p className="mt-2 text-sm leading-7 text-[#667085]">
             Changes are synced automatically while you edit.
