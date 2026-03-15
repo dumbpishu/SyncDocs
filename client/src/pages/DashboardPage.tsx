@@ -198,7 +198,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-[1560px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto flex w-full max-w-390 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="overflow-hidden rounded-[36px] border border-[#dbe3ee] bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-7 shadow-[0_28px_60px_rgba(15,23,42,0.08)]">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
@@ -280,7 +280,7 @@ export default function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-[32px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
+          <section className="rounded-4xl border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-[#101828]">Manage document</p>
@@ -410,7 +410,7 @@ function DocumentSection({
   onOpen: (documentId: string) => void;
 }) {
   return (
-    <section className="rounded-[32px] border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
+    <section className="rounded-4xl border border-[#dde3ec] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.07)]">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-[#101828]">{title}</p>
         <span className="rounded-full bg-[#f2f4f7] px-3 py-1 text-[11px] font-semibold text-[#667085]">
