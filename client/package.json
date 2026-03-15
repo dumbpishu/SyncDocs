@@ -10,11 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lexical/code": "^0.41.0",
+    "@lexical/history": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/markdown": "^0.41.0",
+    "@lexical/react": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/selection": "^0.41.0",
+    "@lexical/table": "^0.41.0",
     "@tailwindcss/vite": "^4.2.1",
     "axios": "^1.13.6",
+    "lexical": "^0.41.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",
+    "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {

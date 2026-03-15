@@ -7,59 +7,72 @@ import { createUniqueUsername } from "../utils/generateUsername";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/appError";
+
+const OTP_EXPIRY_IN_MS = 5 * 60 * 1000;
+
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const issueSessionTokens = async (userId: string) => {
+    const accessToken = generateAccessToken(userId);
+    const refreshToken = await generateRefreshToken(userId);
+
+    return { accessToken, refreshToken };
+};
 
 export const sendOtpService = async (email: string) => {
-    const existingOtp = await OTP.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    const existingOtp = await OTP.findOne({ email: normalizedEmail });
 
     if (existingOtp && existingOtp.expiresAt > new Date()) {
-        throw new Error("OTP already sent. Please wait before requesting a new one.");
+        throw new AppError(429, "OTP already sent. Please wait before requesting a new one.");
     }
 
     const { otp, hashedOtp } = generateOtp();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+    const expiresAt = new Date(Date.now() + OTP_EXPIRY_IN_MS);
 
     await OTP.findOneAndUpdate(
-        { email },
+        { email: normalizedEmail },
         { otp: hashedOtp, expiresAt },
         { upsert: true, new: true }
     );
 
-    await sendEmail(email, "Your OTP for SyncDocs", otpEmailTemplate(otp));
+    await sendEmail(normalizedEmail, "Your OTP for SyncDocs", otpEmailTemplate(otp));
 }
 
 export const verifyOtpService = async (email: string, otp: string) => {
-    const otpRecord = await OTP.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    const otpRecord = await OTP.findOne({ email: normalizedEmail });
 
     if (!otpRecord || otpRecord.expiresAt < new Date()) {
-        throw new Error("OTP has expired or does not exist.");
+        throw new AppError(400, "OTP has expired or does not exist.");
     }
 
     const isValidOtp = await bcrypt.compare(otp, otpRecord.otp);
 
     if (!isValidOtp) {
-        throw new Error("Invalid OTP.");
+        throw new AppError(400, "Invalid OTP.");
     }
 
-    await OTP.deleteOne({ email });
+    await OTP.deleteOne({ email: normalizedEmail });
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
         const username = await createUniqueUsername();
-        user = new User({ email, username, isVerified: true });
+        user = new User({ email: normalizedEmail, username, isVerified: true });
         await user.save();
     }
 
-    const accessToken = generateAccessToken(user._id.toString());
-    const refreshToken = await generateRefreshToken(user._id.toString());
+    const tokens = await issueSessionTokens(user._id.toString());
 
-    return { user, accessToken, refreshToken };
+    return { user, ...tokens };
 }
 
 export const getCurrentUserService = async (userId: string) => {
     const user = await User.findById(userId).select("-__v");
     if (!user) {
-        throw new Error("User not found.");
+        throw new AppError(404, "User not found.");
     }
     return user;
 }
@@ -70,21 +83,19 @@ export const refreshSessionService = async (refreshToken: string) => {
     const user = await User.findById(decoded.id).select("+refreshToken");
 
     if (!user || !user.refreshToken) {
-        throw new Error("Unauthorized");
+        throw new AppError(401, "Unauthorized");
     }
 
     const isValidRefreshToken = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isValidRefreshToken) {
-        throw new Error("Unauthorized");
+        throw new AppError(401, "Unauthorized");
     }
 
-    const accessToken = generateAccessToken(user._id.toString());
-    const nextRefreshToken = await generateRefreshToken(user._id.toString());
+    const tokens = await issueSessionTokens(user._id.toString());
 
     return {
         user,
-        accessToken,
-        refreshToken: nextRefreshToken,
+        ...tokens,
     };
 }

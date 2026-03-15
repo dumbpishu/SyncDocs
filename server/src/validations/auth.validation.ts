@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
+const emailSchema = z.email({ message: "Invalid email address" }).min(5).max(255).trim().toLowerCase();
+
 export const sendOtpSchema = z.object({
-    email: z.email({ message: "Invalid email address" }).min(5).max(255).trim().toLowerCase()
+    email: emailSchema
 });
 
 export const verifyOtpSchema = z.object({
-    email: z.email({ message: "Invalid email address" }).min(5).max(255).trim().toLowerCase(),
+    email: emailSchema,
     otp: z.string().length(6, { message: "OTP must be 6 digits" })
 });
 

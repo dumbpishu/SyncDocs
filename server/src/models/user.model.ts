@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -45,14 +44,5 @@ const userSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: true });   
-
-
-userSchema.methods.generateAccessToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_ACCESS_SECRET!, { expiresIn: "15m", algorithm: "HS256" });
-}
-
-userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d", algorithm: "HS256" });
-}
 
 export const User = mongoose.model("User", userSchema);

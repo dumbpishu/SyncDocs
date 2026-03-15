@@ -21,7 +21,8 @@ const documentSchema = new mongoose.Schema({
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
+                ref: "User",
+                required: true
             },
             role: {
                 type: String,
@@ -41,6 +42,7 @@ const documentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 documentSchema.index({ owner: 1 });
-documentSchema.index( { "collaborators.user": 1 });
+documentSchema.index({ owner: 1, isDeleted: 1, updatedAt: -1 });
+documentSchema.index({ "collaborators.user": 1, isDeleted: 1, updatedAt: -1 });
 
 export const Document = mongoose.model("Document", documentSchema);

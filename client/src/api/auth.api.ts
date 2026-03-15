@@ -1,24 +1,26 @@
 import { api } from "../services/axios";
+import type { ApiSuccessResponse } from "../types/api";
 import type { AuthUserResponse, User } from "../types/auth";
+import { unwrapApiResponse } from "../utils/api";
 
 export const sendOtp = async (email: string) => {
-    const res = await api.post("/auth/send-otp", { email });
+    const res = await api.post<ApiSuccessResponse<null>>("/auth/send-otp", { email });
     return res.data;
-}
+};
 
 export const verifyOtp = async (email: string, otp: string) => {
-    const res = await api.post("/auth/verify-otp", { email, otp });
-    return res.data as { message: string; user: User };
-}
+    const res = await api.post<ApiSuccessResponse<{ user: User; accessToken: string; refreshToken: string }>>("/auth/verify-otp", { email, otp });
+    return unwrapApiResponse(res.data);
+};
 
 export const getCurrentUser = async () => {
-    const res = await api.get("/auth/me");
-    return res.data as AuthUserResponse;
-}
+    const res = await api.get<ApiSuccessResponse<AuthUserResponse>>("/auth/me");
+    return unwrapApiResponse(res.data);
+};
 
 export const refreshSession = async () => {
-    const res = await api.post("/auth/refresh", undefined, {
+    const res = await api.post<ApiSuccessResponse<{ user: User; accessToken: string; refreshToken: string }>>("/auth/refresh", undefined, {
         skipAuthRefresh: true,
     });
-    return res.data as AuthUserResponse;
-}
+    return unwrapApiResponse(res.data);
+};

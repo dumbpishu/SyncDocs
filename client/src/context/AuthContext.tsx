@@ -24,8 +24,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const refreshUser = async () => {
     try {
       const data = await getCurrentUser();
-      setUser(data.user);
-      return data.user;
+      const nextUser = data?.user ?? null;
+      setUser(nextUser);
+      return nextUser;
     } catch {
       setUser(null);
       return null;

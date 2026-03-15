@@ -6,6 +6,7 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import VerifyOtpPage from "../pages/VerifyOtpPage";
 import DashboardPage from "../pages/DashboardPage";
+import DocumentEditorPage from "../pages/DocumentEditorPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -26,6 +27,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "documents/:id",
+        element: (
+          <ProtectedRoute>
+            <DocumentEditorPage />
           </ProtectedRoute>
         )
       }

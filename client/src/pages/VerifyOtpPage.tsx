@@ -3,6 +3,7 @@ import { useState } from "react";
 import { verifyOtp } from "../api/auth.api";
 import AuthLayout from "../components/layouts/AuthLayout";
 import { useAuth } from "../context/AuthContext";
+import { getApiErrorMessage } from "../utils/api";
 
 export default function VerifyOtpPage() {
   const location = useLocation();
@@ -31,10 +32,12 @@ export default function VerifyOtpPage() {
 
     try {
       const data = await verifyOtp(email, otp.trim());
-      markAuthenticated(data.user);
+      if (data?.user) {
+        markAuthenticated(data.user);
+      }
       navigate("/dashboard", { replace: true });
-    } catch {
-      setError("That OTP didn't work. Double-check the code and try again.");
+    } catch (error) {
+      setError(getApiErrorMessage(error, "That OTP didn't work. Double-check the code and try again."));
     } finally {
       setLoading(false);
     }
@@ -44,16 +47,16 @@ export default function VerifyOtpPage() {
 
   return (
     <AuthLayout>
-      <div className="mb-8">
-        <h2 className="text-3xl font-semibold tracking-tight text-stone-900">
+      <div className="mb-8 animate-[slideUp_500ms_ease-out]">
+        <h2 className="text-3xl font-semibold tracking-tight text-[#191919] sm:text-4xl">
           Check your inbox
         </h2>
-        <p className="mt-3 text-sm leading-6 text-stone-600">
-          We sent a one-time passcode to <span className="font-medium text-stone-900">{email}</span>.
+        <p className="mt-3 text-sm leading-6 text-[#6b6b6b]">
+          We sent a one-time passcode to <span className="font-medium text-[#191919]">{email}</span>.
         </p>
       </div>
 
-      <label className="mb-2 block text-sm font-medium text-stone-700" htmlFor="otp">
+      <label className="mb-2 block text-sm font-medium text-[#3f3f3f]" htmlFor="otp">
         One-time passcode
       </label>
       <input
@@ -61,13 +64,13 @@ export default function VerifyOtpPage() {
         inputMode="numeric"
         maxLength={6}
         placeholder="Enter OTP"
-        className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-stone-900 outline-none transition focus:border-orange-400 focus:bg-white"
+        className="w-full rounded-xl border border-black/8 bg-white px-4 py-3 text-[#191919] outline-none transition focus:border-[#191919]"
         value={otp}
         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
       />
 
       {error ? (
-        <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        <p className="mt-3 rounded-xl border border-black/8 bg-[#f1f1ef] px-4 py-3 text-sm text-[#3f3f3f] animate-[fadeIn_250ms_ease-out]">
           {error}
         </p>
       ) : null}
@@ -75,7 +78,7 @@ export default function VerifyOtpPage() {
       <button
         onClick={handleVerify}
         disabled={loading}
-        className="mt-6 w-full rounded-2xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+        className="mt-6 w-full rounded-xl bg-[#191919] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2f2f2f] disabled:cursor-not-allowed disabled:opacity-70"
       >
         {loading ? "Verifying..." : "Verify OTP"}
       </button>
